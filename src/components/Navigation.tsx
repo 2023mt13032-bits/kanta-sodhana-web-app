@@ -110,11 +110,16 @@ export default function Navigation() {
     e.preventDefault();
     window.dispatchEvent(new CustomEvent("ks-reveal-sections"));
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-      });
-    });
+    // Wait for React re-render after belowFold reveal, then scroll
+    const tryScroll = (attempts = 0) => {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      } else if (attempts < 15) {
+        setTimeout(() => tryScroll(attempts + 1), 30);
+      }
+    };
+    requestAnimationFrame(() => tryScroll());
   };
 
   const isActive = (href: string) => {
