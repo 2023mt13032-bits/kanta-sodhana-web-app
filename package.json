@@ -7,11 +7,10 @@
   },
   "scripts": {
     "dev": "NEXT_TELEMETRY_DISABLED=1 next dev --turbopack --port 3002",
-    "dev:all": "concurrently --names \"FRONTEND,RS,Medoo,Auth,DocForgery,DupTamper,QRVerify\" --prefix-colors \"cyan,magenta,yellow,blue,white,gray,red\" \"NEXT_TELEMETRY_DISABLED=1 next dev --turbopack --port 3002\" \"cd ../services/backend && ./venv/bin/uvicorn main:app --port 8000\" \"cd ../services/medoo && npm run dev\" \"cd ../services/kantaka-auth && ./venv/bin/python app.py\" \"cd ../services/doc-forgery && ./venv/bin/python main.py\" \"cd ../services/dup-tamper && ./venv/bin/python main.py\" \"cd ../services/qr-verify && ./venv/bin/python main.py\"",
+    "dev:all": "concurrently --names \"FRONTEND,RS,Auth,DocForgery,DupTamper,QRVerify\" --prefix-colors \"cyan,magenta,blue,white,gray,red\" \"NEXT_TELEMETRY_DISABLED=1 next dev --turbopack --port 3002\" \"cd ../services/backend && ./venv/bin/uvicorn main:app --port 8000\" \"cd ../services/kantaka-auth && ./venv/bin/python app.py\" \"cd ../services/doc-forgery && ./venv/bin/python main.py\" \"cd ../services/dup-tamper && ./venv/bin/python main.py\" \"cd ../services/qr-verify && ./venv/bin/python main.py\"",
     "dev:core": "concurrently --names \"FRONTEND,Auth\" --prefix-colors \"cyan,blue\" \"NEXT_TELEMETRY_DISABLED=1 next dev --turbopack --port 3002\" \"cd ../services/kantaka-auth && ./venv/bin/python app.py\"",
     "dev:frontend": "NEXT_TELEMETRY_DISABLED=1 next dev --turbopack --port 3002",
     "dev:backend": "cd ../services/backend && ./venv/bin/uvicorn main:app --reload --port 8000",
-    "dev:medoo": "cd ../services/medoo && npm run dev",
     "dev:auth": "cd ../services/kantaka-auth && ./venv/bin/python app.py",
     "dev:docforgery": "cd ../services/doc-forgery && ./venv/bin/python main.py",
     "dev:duptamper": "cd ../services/dup-tamper && ./venv/bin/python main.py",

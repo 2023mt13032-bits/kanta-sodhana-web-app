@@ -205,7 +205,7 @@ export default function Home() {
                 delay={i * 0.1}
                 className="group flex flex-col items-center justify-center gap-3 bg-[var(--surface)] px-6 py-10 transition-colors duration-300 hover:bg-[var(--accent)]/5"
               >
-                <div className="origin-bottom font-mono text-5xl font-bold text-[var(--accent)] transition-transform duration-300 group-hover:scale-110 md:text-6xl">
+                <div className="origin-bottom font-mono text-3xl font-bold text-[var(--accent)] transition-transform duration-300 group-hover:scale-110 md:text-5xl lg:text-6xl">
                   <CountUp value={stat.value} />
                 </div>
                 <p className="text-center font-mono text-[9px] uppercase leading-relaxed tracking-[0.3em] text-[var(--text-muted)]">

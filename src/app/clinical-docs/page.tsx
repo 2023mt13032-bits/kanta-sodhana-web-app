@@ -111,7 +111,7 @@ export default function ClinicalDocsPage() {
         <div className="mb-10 flex items-start justify-between gap-6">
           <div>
             <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.4em] text-[var(--accent)]">NHA PS1 — AB PM-JAY HACKATHON</p>
-            <h1 className="font-mono text-4xl font-bold text-[var(--text)]">Clinical Document Classifier</h1>
+            <h1 className="font-mono text-2xl font-bold md:text-4xl text-[var(--text)]">Clinical Document Classifier</h1>
             <p className="mt-2 font-mono text-sm text-[var(--text-muted)] max-w-xl">
               Multi-package claim document classification with STG compliance checks across MG064A, SG039C, MG006A, SB039A.
             </p>

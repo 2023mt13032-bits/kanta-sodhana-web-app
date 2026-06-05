@@ -27,7 +27,7 @@ export default function ChamberIntro({
         <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--accent)]/35" />
       </div>
 
-      <div className="relative grid gap-8 md:grid-cols-[minmax(0,1fr)_340px] md:items-end">
+      <div className="relative grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-end lg:grid-cols-[minmax(0,1fr)_340px]">
         <span className="pointer-events-none absolute -left-4 -top-6 select-none font-mono text-[100px] font-bold leading-none text-[var(--text)]/[0.03] md:-left-6 md:-top-8 md:text-[140px]">
           {index}
         </span>
@@ -36,7 +36,7 @@ export default function ChamberIntro({
           <p className="mb-4 font-mono text-[10px] tracking-[0.4em] uppercase text-[var(--accent)]">
             Threshold Established
           </p>
-          <h2 className="font-mono text-3xl font-bold text-[var(--text)] md:text-5xl">
+          <h2 className="font-mono text-2xl font-bold text-[var(--text)] md:text-4xl lg:text-5xl">
             {title}
           </h2>
           <p className="mt-5 max-w-2xl font-mono text-sm leading-relaxed text-[var(--text-muted)]">

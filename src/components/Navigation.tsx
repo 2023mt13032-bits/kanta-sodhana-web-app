@@ -129,10 +129,10 @@ export default function Navigation() {
   };
 
   return (
-    <nav className={`fixed top-4 left-1/2 z-[100] -translate-x-1/2 transition-all duration-300 ${visible ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"}`}>
-      <div className="flex items-center gap-4">
+    <nav className={`fixed top-3 left-1/2 z-[100] w-[calc(100vw-24px)] max-w-fit -translate-x-1/2 transition-all duration-300 ${visible ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"}`}>
+      <div className="flex items-center gap-2 md:gap-4">
         <ul
-          className="relative flex items-center rounded-full border border-black/[0.12] bg-[var(--surface)]/95 p-1 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.18)]"
+          className="relative flex items-center rounded-full border border-black/[0.12] bg-[var(--surface)]/95 p-1 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.18)] overflow-x-auto scrollbar-none"
           onMouseLeave={() => setPosition((p) => ({ ...p, opacity: 0 }))}
         >
           {NAV_LINKS.map((link) => (
@@ -149,39 +149,44 @@ export default function Navigation() {
           <Cursor position={position} />
         </ul>
 
-        <div className="flex items-center gap-3 rounded-full border border-black/[0.12] bg-[var(--surface)]/95 px-3 py-1.5 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.18)]">
+        {/* Clock hidden on mobile */}
+        <div className="hidden md:flex items-center gap-3 rounded-full border border-black/[0.12] bg-[var(--surface)]/95 px-3 py-1.5 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.18)]">
           <LiveClock />
           <div className="h-4 w-px bg-[var(--border)]" />
+          <ThemeToggle />
+        </div>
+        {/* Theme toggle only on mobile */}
+        <div className="flex md:hidden items-center rounded-full border border-black/[0.12] bg-[var(--surface)]/95 px-2 py-1.5 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.18)]">
           <ThemeToggle />
         </div>
 
         <div className="flex items-center gap-1 rounded-full border border-black/[0.12] bg-[var(--surface)]/95 p-1 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.18)]">
           {user ? (
             <>
-              <span className="whitespace-nowrap px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-[var(--accent)]">
+              <span className="hidden sm:block whitespace-nowrap px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-[var(--accent)]">
                 {user.username}
               </span>
               {user.is_admin && (
                 <Link
                   href="/admin"
-                  className="whitespace-nowrap rounded-full border border-[var(--accent)]/40 px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+                  className="whitespace-nowrap rounded-full border border-[var(--accent)]/40 px-2 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10 md:px-3"
                 >
                   Admin
                 </Link>
               )}
               <button
                 onClick={() => logout()}
-                className="whitespace-nowrap rounded-full border border-[var(--border)] px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
+                className="whitespace-nowrap rounded-full border border-[var(--border)] px-2 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-[var(--text-muted)] transition-colors hover:text-[var(--accent)] md:px-3"
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link href="/login" className="whitespace-nowrap px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-[var(--text-muted)] transition-colors duration-200 hover:text-[var(--text)] rounded-full">
+              <Link href="/login" className="whitespace-nowrap px-2 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-[var(--text-muted)] transition-colors duration-200 hover:text-[var(--text)] rounded-full md:px-3">
                 Login
               </Link>
-              <Link href="/signup" className="whitespace-nowrap rounded-full bg-[var(--accent)] px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-white transition-opacity duration-200 hover:opacity-90">
+              <Link href="/signup" className="whitespace-nowrap rounded-full bg-[var(--accent)] px-2 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] text-white transition-opacity duration-200 hover:opacity-90 md:px-3">
                 Sign Up
               </Link>
             </>

@@ -6,7 +6,8 @@ import type {
   FeatureImportances,
 } from "./types";
 
-const BASE = "/api/risk";
+const BASE =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 async function post<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

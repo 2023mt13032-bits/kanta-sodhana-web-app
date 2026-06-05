@@ -86,7 +86,7 @@ function UploadZone({ onFile }: { onFile: (file: File) => void }) {
       onDragLeave={() => setDrag(false)}
       onDrop={(e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files[0]; if (f) handle(f); }}
       onClick={() => ref.current?.click()}
-      className={`cursor-pointer rounded-2xl border-2 border-dashed p-16 text-center transition-all ${drag ? "border-[var(--accent)] bg-[var(--accent)]/5" : "border-[var(--border)] hover:border-[var(--accent)]/40 bg-[var(--surface)]"}`}
+      className={`cursor-pointer rounded-2xl border-2 border-dashed p-8 md:p-16 text-center transition-all ${drag ? "border-[var(--accent)] bg-[var(--accent)]/5" : "border-[var(--border)] hover:border-[var(--accent)]/40 bg-[var(--surface)]"}`}
     >
       <input ref={ref} type="file" accept=".csv" className="hidden" onChange={(e) => e.target.files?.[0] && handle(e.target.files[0])} />
       <Upload size={28} className="mx-auto mb-3 text-[var(--text-muted)]" />
@@ -143,7 +143,7 @@ export default function SameDayPage() {
       <div className="min-h-screen px-6 py-24">
         <div className="mx-auto max-w-3xl">
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.4em] text-[var(--accent)]">KS-SD-001 — FRAUD DETECTION</p>
-          <h1 className="mb-3 font-mono text-4xl font-bold text-[var(--text)]">Same-Day Admission Fraud</h1>
+          <h1 className="mb-3 font-mono text-2xl font-bold md:text-4xl text-[var(--text)]">Same-Day Admission Fraud</h1>
           <p className="mb-10 font-mono text-sm text-[var(--text-muted)]">Upload admission/discharge data to detect same-day fraud patterns, repeat offenders, and high-risk hospitals.</p>
           {/* Sample banner */}
           <div className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 flex items-start justify-between gap-4">

@@ -139,7 +139,7 @@ function UploadZone({ onFile }: { onFile: (f: File) => void }) {
       onDragLeave={() => setDrag(false)}
       onDrop={(e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files[0]; if (f?.name.endsWith(".csv")) onFile(f); }}
       onClick={() => ref.current?.click()}
-      className={`cursor-pointer rounded-2xl border-2 border-dashed p-16 text-center transition-all ${drag ? "border-[var(--accent)] bg-[var(--accent)]/5" : "border-[var(--border)] hover:border-[var(--accent)]/40 bg-[var(--surface)]"}`}
+      className={`cursor-pointer rounded-2xl border-2 border-dashed p-8 md:p-16 text-center transition-all ${drag ? "border-[var(--accent)] bg-[var(--accent)]/5" : "border-[var(--border)] hover:border-[var(--accent)]/40 bg-[var(--surface)]"}`}
     >
       <input ref={ref} type="file" accept=".csv" className="hidden" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
       <Upload size={28} className="mx-auto mb-3 text-[var(--text-muted)]" />
@@ -212,7 +212,7 @@ export default function FamilyClusterPage() {
       <div className="min-h-screen px-6 py-24">
         <div className="mx-auto max-w-3xl">
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.4em] text-[var(--accent)]">KS-FC-001 — FRAUD DETECTION</p>
-          <h1 className="mb-3 font-mono text-4xl font-bold text-[var(--text)]">Family Cluster Fraud</h1>
+          <h1 className="mb-3 font-mono text-2xl font-bold md:text-4xl text-[var(--text)]">Family Cluster Fraud</h1>
           <p className="mb-10 font-mono text-sm text-[var(--text-muted)]">Detect coordinated family admission fraud rings by analysing diagnosis patterns, timing clusters, and high-risk admission sequences.</p>
           {/* Sample banner */}
           <div className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 flex items-start justify-between gap-4">

@@ -142,8 +142,9 @@ const USE_CASES: CaseStudy[] = [
   },
 ];
 
-const ITEM_WIDTH = 360;
-const ITEM_GAP = 32;
+// Card width: 300px on small screens, 360px on desktop
+const ITEM_WIDTH = typeof window !== "undefined" && window.innerWidth < 640 ? 280 : 360;
+const ITEM_GAP = typeof window !== "undefined" && window.innerWidth < 640 ? 16 : 32;
 const STEP = ITEM_WIDTH + ITEM_GAP;
 
 const STATUS_COLORS: Record<string, string> = {

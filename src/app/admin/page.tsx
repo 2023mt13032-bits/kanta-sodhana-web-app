@@ -105,7 +105,7 @@ export default function AdminPage() {
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.4em] text-[var(--accent)]">
             SYSTEM ACCESS
           </p>
-          <h1 className="font-mono text-4xl font-bold text-[var(--text)]">
+          <h1 className="font-mono text-2xl font-bold md:text-4xl text-[var(--text)]">
             ADMIN PANEL
           </h1>
           <p className="mt-2 font-mono text-xs text-[var(--text-muted)]">

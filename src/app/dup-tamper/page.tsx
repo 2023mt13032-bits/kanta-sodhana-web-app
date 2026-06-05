@@ -126,7 +126,7 @@ export default function DupTamperPage() {
 
         <div className="mb-10">
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.4em] text-[var(--accent)]">KS-DT-001 — FRAUD DETECTION</p>
-          <h1 className="font-mono text-4xl font-bold text-[var(--text)]">Duplication & Tampering</h1>
+          <h1 className="font-mono text-2xl font-bold md:text-4xl text-[var(--text)]">Duplication & Tampering</h1>
           <p className="mt-2 font-mono text-sm text-[var(--text-muted)]">
             Upload two claim document images. Detects exact duplicates (SHA-256), visual similarity (pHash), and tampered regions (SSIM + contour analysis).
           </p>

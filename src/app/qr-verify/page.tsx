@@ -87,7 +87,7 @@ export default function QRVerifyPage() {
 
         <div className="mb-10">
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.4em] text-[var(--accent)]">KS-QR-001 — KANTAKA ŚODHANA</p>
-          <h1 className="font-mono text-4xl font-bold text-[var(--text)]">Death Certificate QR Verification</h1>
+          <h1 className="font-mono text-2xl font-bold md:text-4xl text-[var(--text)]">Death Certificate QR Verification</h1>
           <p className="mt-2 font-mono text-sm text-[var(--text-muted)]">
             Upload a death certificate. Decodes QR code → scrapes official portal → cross-references against OCR-extracted text to detect forgeries.
           </p>

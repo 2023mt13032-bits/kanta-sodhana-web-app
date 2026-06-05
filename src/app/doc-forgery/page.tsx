@@ -86,7 +86,7 @@ export default function DocForgeryPage() {
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.4em] text-[var(--accent)]">
             NHA PS3 — AB PM-JAY HACKATHON
           </p>
-          <h1 className="font-mono text-4xl font-bold text-[var(--text)]">
+          <h1 className="font-mono text-2xl font-bold md:text-4xl text-[var(--text)]">
             DOCUMENT FORGERY DETECTION
           </h1>
           <p className="mt-3 font-mono text-sm text-[var(--text-muted)] max-w-xl">
