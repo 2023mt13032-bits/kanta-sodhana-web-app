@@ -81,7 +81,7 @@ export default function Navigation() {
       lastY.current = current;
 
       // Track active section
-      const ids = ["process", "stack", "wins", "use-cases", "team", "contact"];
+      const ids = ["process", "stack", "wins", "use-cases", "contact"];
       for (const id of [...ids].reverse()) {
         const el = document.getElementById(id);
         if (el && el.getBoundingClientRect().top <= 120) {
