@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
-const AUTH_API = "";
+const AUTH_API = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkcHNiYW10cW1wYWRlYmRscGFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzg0MzgsImV4cCI6MjA4NzIxNDQzOH0.N5MgOjG9g8oAlTQgQeAzHWXFcypjJeci9L0qtFvxlCY";
 
 export type AuthUser = {
   id: number;
