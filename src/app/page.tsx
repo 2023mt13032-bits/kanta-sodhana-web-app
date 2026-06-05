@@ -321,15 +321,6 @@ export default function Home() {
 
             <UseCasesScroller />
 
-            <section id="team" className="relative overflow-hidden border-t border-[var(--border)] px-6 py-24">
-              <div className="mx-auto max-w-5xl">
-                <ScrollCard className="mb-16">
-                  <ChamberIntro {...HOMEPAGE_CHAMBERS.team} />
-                </ScrollCard>
-                <TeamShowcase members={HOMEPAGE_TEAM_MEMBERS} />
-              </div>
-            </section>
-
             <section id="contact" className="relative overflow-hidden border-t border-[var(--border)] px-6 py-32">
               <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/4 opacity-30">
                 <EnergyRing size={600} />
