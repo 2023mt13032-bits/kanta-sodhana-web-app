@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Family Admission Cluster Detection</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --text:#eaf0ff;
+      --muted:#a9b6dd;
+      --border:rgba(255,255,255,.08);
+      --accent:#6ee7ff;
+      --accent2:#8b5cf6;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --shadow2: 0 35px 90px rgba(0,0,0,.65);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 900px at 18% 0%, rgba(139,92,246,.22), transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, rgba(110,231,255,.20), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 100%); margin:0 auto; padding:0 20px;}
+    header{
+      position:sticky;top:0;z-index:200;
+      backdrop-filter: blur(16px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 0;gap:16px;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:42px;height:42px;border-radius:16px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.16));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 0 55px rgba(110,231,255,.18);
+    }
+    .logo i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .nav a.btn{
+      padding:10px 14px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      font-weight:900;
+    }
+
+    .page{padding:32px 0 50px;}
+    .title{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      gap:16px;flex-wrap:wrap;
+    }
+    h1{margin:0;font-size:clamp(1.8rem, 3vw, 2.4rem);letter-spacing:-.03em;}
+    p{color:var(--muted);line-height:1.7;margin:10px 0 0;max-width:85ch;}
+
+    .grid{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute;inset:-90px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(110,231,255,.16), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.16), transparent 60%);
+      filter: blur(22px);
+      opacity:.65;
+      z-index:0;
+    }
+    .card *{position:relative;z-index:1;}
+
+    .pill{
+      padding:7px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:.84rem;font-weight:800;
+      width:max-content;
+    }
+
+    .form{display:grid;gap:12px;margin-top:14px;}
+    label{font-weight:800;color:#dbe7ff;font-size:.95rem;}
+    input,select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      color:var(--text);
+      outline:none;
+    }
+    input:focus,select:focus{
+      border-color: rgba(110,231,255,.35);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.08);
+    }
+
+    .btn{
+      padding:13px 16px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:#eaffff;font-weight:900;
+      cursor:pointer;
+      display:inline-flex;align-items:center;gap:10px;
+      transition: transform .2s ease, border .2s ease;
+    }
+    .btn:hover{transform: translateY(-2px);border-color: rgba(110,231,255,.35);}
+    .btn.primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#070a12;border-color:transparent;
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+    .kpi{
+      padding:14px;border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .kpi b{
+      display:block;font-size:1.6rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .kpi span{display:block;color:var(--muted);margin-top:6px;line-height:1.4;}
+
+    .fakegraph{
+      height:260px;border-radius:18px;
+      border:1px dashed rgba(255,255,255,.14);
+      background: rgba(255,255,255,.02);
+      display:grid;place-items:center;
+      color: rgba(232,240,255,.55);
+      text-align:center;
+      padding:18px;
+      margin-top:14px;
+    }
+
+    .note{
+      margin-top:12px;
+      color: var(--muted);
+      line-height:1.6;
+      font-size:.95rem;
+    }
+
+    @media(max-width:980px){
+      .grid{grid-template-columns:1fr}
+      .kpis{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-people-group"></i></div>
+        <div>
+          <div style="font-weight:900;">Family Cluster</div>
+          <div style="color:rgba(232,240,255,.65);font-size:.92rem;">Demo Interface</div>
+        </div>
+      </div>
+      <a class="btn" href="{{ url_for('usecases') }}">
+    <i class="fa-solid fa-arrow-left"></i> Back
+</a>
+    </div>
+  </div>
+</header>
+
+<section class="page">
+  <div class="container">
+    <div class="title">
+      <div>
+        <h1>Family Member Admission Cluster Detection</h1>
+        <p>
+          This interface simulates how repeated admissions across related claimants can reveal
+          organized fraud rings or collusion.
+        </p>
+      </div>
+      <span class="pill">Structured Data</span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="pill">Cluster Query</div>
+
+        <div class="form">
+          <div>
+            <label>Primary Member ID</label>
+            <input id="memberId" placeholder="E.g. MEM-90021"/>
+          </div>
+          <div>
+            <label>Family Group</label>
+            <select id="family">
+              <option>Policy Family Group A</option>
+              <option>Policy Family Group B</option>
+              <option>Policy Family Group C</option>
+            </select>
+          </div>
+          <div>
+            <label>Lookback Window</label>
+            <select id="window">
+              <option>30 Days</option>
+              <option>90 Days</option>
+              <option>180 Days</option>
+              <option>365 Days</option>
+            </select>
+          </div>
+
+          <button class="btn primary" id="scanBtn">
+            <i class="fa-solid fa-diagram-project"></i> Scan Family Network
+          </button>
+        </div>
+
+        <div class="note">
+          Output is a static demo view.  
+          Next stage: graph clustering + anomaly scoring.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="pill">Cluster Output</div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <b id="clusterScore">--</b>
+            <span>Cluster Suspicion</span>
+          </div>
+          <div class="kpi">
+            <b id="members">--</b>
+            <span>Linked Members</span>
+          </div>
+        </div>
+
+        <div class="fakegraph">
+          <div>
+            <b style="display:block; font-size:1.05rem; color:#eaf0ff;">Graph View</b>
+            <div style="margin-top:8px;">
+              (Placeholder: family → hospitals → claims network)
+            </div>
+          </div>
+        </div>
+
+        <div class="note" id="explain">
+          Click Scan to generate a demo network output.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const btn = document.getElementById("scanBtn");
+  const clusterScore = document.getElementById("clusterScore");
+  const members = document.getElementById("members");
+  const explain = document.getElementById("explain");
+
+  btn.addEventListener("click", () => {
+    const win = document.getElementById("window").value;
+
+    let score = "LOW";
+    let mem = 2;
+
+    if(win.includes("365")){ score = "HIGH"; mem = 9; }
+    else if(win.includes("180")){ score = "MEDIUM"; mem = 6; }
+    else if(win.includes("90")){ score = "MEDIUM"; mem = 4; }
+
+    clusterScore.textContent = score;
+    members.textContent = mem;
+
+    explain.innerHTML = `
+      <b style="color:#eaffff;">Evidence:</b><br/>
+      • Multiple linked admissions detected.<br/>
+      • Same providers repeated across family members.<br/>
+      • Graph clustering will be integrated in backend stage.
+    `;
+  });
+</script>
+
+</body>
+</html>

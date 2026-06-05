@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kantaka Śodhana — Secure Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #070a12; --panel: #0d1220; --text: #eaf0ff; --muted: #a9b6dd;
+            --accent: #6ee7ff; --accent2: #8b5cf6; --radius: 28px;
+            --robot-color: #25d366;
+        }
+        body {
+            margin: 0; padding: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+            background: radial-gradient(1200px 900px at 18% 0%, rgba(139,92,246,.15), transparent 60%), var(--bg);
+            color: var(--text); height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px; 
+            width: 100%;
+            max-width: 1400px; /* Increased width to accommodate larger robot */
+        }
+        
+        /* Left Column: Login Card */
+        .glass-card {
+            background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+            backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.1);
+            padding: 40px; border-radius: var(--radius); box-shadow: 0 35px 90px rgba(0,0,0,.6);
+            position: relative; overflow: hidden; width: 100%; max-width: 420px;
+            z-index: 10; /* Ensure card stays above any robot overlaps */
+        }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px; color: var(--accent);
+            text-decoration: none; font-size: 0.85rem; font-weight: 700; margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .back-link:hover { opacity: 0.8; transform: translateX(-3px); }
+
+        h2 { font-size: 2.1rem; letter-spacing: -0.03em; margin: 0 0 10px; }
+        input {
+            width: 100%; padding: 16px; margin: 12px 0; border-radius: 16px;
+            background: rgba(232, 240, 255, 0.9); border: 1px solid rgba(255,255,255,0.08);
+            color: #070a12; outline: none; box-sizing: border-box; font-size: 1rem;
+        }
+        .btn {
+            width: 100%; padding: 16px; margin-top: 15px; border-radius: 999px; border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #070a12; font-weight: 800; cursor: pointer; font-size: 1rem;
+        }
+
+        /* Right Column: Integrated Robot (No Container) */
+        .sidebar-robot {
+            position: relative;
+            width: 700px; /* Significantly larger size */
+            height: 700px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #robot-canvas { 
+            height: 100%; 
+            width: 100%; 
+            cursor: pointer;
+            /* Subtle glow to help it pop against the background without a box */
+            filter: drop-shadow(0 0 50px rgba(110, 231, 255, 0.1));
+        }
+        
+        /* Robot Animations */
+        .robot-canvas-fun { animation: robot-bounce 0.6s ease; }
+        .robot-canvas-angry { filter: drop-shadow(0 0 60px rgba(255, 70, 70, 0.4)); }
+        .robot-canvas-collapse { animation: robot-collapse 1.2s ease forwards; }
+        .robot-canvas-reappear { animation: robot-reappear 0.6s ease; }
+        
+        /* Message Pops */
+        .robot-pop {
+            position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+            font-size: 1.2rem; padding: 10px 20px; border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            color: #eafff6; animation: robot-pop 0.9s ease forwards; z-index: 20;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .robot-bubble {
+            position: absolute; width: 15px; height: 15px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, white, var(--robot-color));
+            animation: robot-bubble 0.9s ease forwards; z-index: 20;
+        }
+
+        @keyframes robot-bounce { 0%, 100% { transform: scale(1); } 35% { transform: scale(1.05); } }
+        @keyframes robot-collapse { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.8); } }
+        @keyframes robot-reappear { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes robot-bubble { 0% { opacity: 0; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-30px); } }
+        @keyframes robot-pop { 0% { opacity: 0; transform: translate(-50%, 20px); } 100% { opacity: 0; transform: translate(-50%, -20px); } }
+
+        @media (max-width: 1100px) {
+            .sidebar-robot { display: none; }
+            .login-container { max-width: 420px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="glass-card">
+            <a href="{{ url_for('index') }}" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i> Back to Website
+            </a>
+            <h2>Sign In</h2>
+            <p style="color: var(--muted); margin-bottom: 25px;">Welcome back to the Forensics Dashboard.</p>
+            
+            <form method="POST">
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button class="btn" type="submit">Unlock Dashboard</button>
+            </form>
+            
+            <p style="margin-top: 25px; font-size: 0.85rem; text-align: center;">
+                Need an account? <a href="{{ url_for('register') }}" style="color: var(--accent); font-weight: 700; text-decoration: none;">Request Access</a>
+            </p>
+        </div>
+
+        <div class="sidebar-robot" id="robot-hook">
+            <canvas id="robot-canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('robot-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            const dpr = window.devicePixelRatio || 1;
+            const size = 700; // Large size
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            ctx.scale(dpr, dpr);
+
+            let mouse = { x: 0, y: 0 };
+            let target = { x: 0, y: 0 };
+            let blink = 0;
+            let time = 0;
+            let clickCount = 0;
+            let lastClick = 0;
+            let angryUntil = 0;
+            let collapseUntil = 0;
+            let laughUntil = 0;
+            let mouthMode = 'smile';
+            let mouthUntil = 0;
+
+            const updateTarget = (clientX, clientY) => {
+                const rect = canvas.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                target.x = (clientX - cx) / (rect.width / 2);
+                target.y = (clientY - cy) / (rect.height / 2);
+            };
+
+            window.addEventListener('mousemove', (e) => updateTarget(e.clientX, e.clientY));
+
+            function draw() {
+                time += 0.05;
+                mouse.x += (target.x - mouse.x) * 0.1;
+                mouse.y += (target.y - mouse.y) * 0.1;
+
+                const w = 700;
+                const h = 700;
+                const cx = w / 2;
+                const cy = h / 2 + 20;
+
+                ctx.clearRect(0, 0, w, h);
+                const now = Date.now();
+                
+                if (now < collapseUntil) {
+                    canvas.style.opacity = '0';
+                    requestAnimationFrame(draw);
+                    return;
+                }
+                
+                canvas.style.opacity = '1';
+                const isAngry = now < angryUntil;
+                const isLaughing = now < laughUntil;
+                canvas.classList.toggle('robot-canvas-angry', isAngry);
+
+                // Shadow
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                ctx.beginPath();
+                ctx.ellipse(cx, cy + 180, 100 + (Math.sin(time) * 10), 20, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                const floatY = Math.sin(time) * 15;
+                const bodyX = cx + mouse.x * 12;
+                const bodyY = cy + floatY + 60;
+
+                // Body
+                let bodyGrad = ctx.createRadialGradient(bodyX - 50, bodyY - 50, 20, bodyX, bodyY, 140);
+                bodyGrad.addColorStop(0, '#ffffff');
+                bodyGrad.addColorStop(1, '#d1d9e6');
+                ctx.fillStyle = bodyGrad;
+                ctx.beginPath();
+                ctx.ellipse(bodyX, bodyY, 110, 100, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Logo
+                const logoX = bodyX + mouse.x * 20;
+                const logoY = bodyY + mouse.y * 12;
+                ctx.fillStyle = '#25d366';
+                ctx.beginPath();
+                ctx.arc(logoX, logoY, 32, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(logoX - 8, logoY - 8, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Head
+                const headX = cx + mouse.x * 50;
+                const headY = cy + floatY - 100 + (mouse.y * 30);
+                let headGrad = ctx.createRadialGradient(headX - 60, headY - 50, 30, headX, headY, 160);
+                headGrad.addColorStop(0, '#ffffff');
+                headGrad.addColorStop(1, '#cbd5e1');
+                ctx.fillStyle = headGrad;
+                ctx.beginPath();
+                ctx.roundRect(headX - 120, headY - 95, 240, 190, 80);
+                ctx.fill();
+
+                // Face
+                const faceX = headX + mouse.x * 20;
+                const faceY = headY + mouse.y * 18;
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.roundRect(faceX - 95, faceY - 65, 190, 130, 45);
+                ctx.fill();
+
+                // Eyes
+                if (Math.random() > 0.98) blink = 1;
+                if (blink > 0) blink -= 0.15;
+                const eyeColor = isAngry ? '#ff4d4d' : '#25d366';
+                ctx.fillStyle = eyeColor;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = eyeColor;
+
+                if (blink <= 0.2) {
+                    ctx.beginPath();
+                    ctx.ellipse(faceX - 45 + (mouse.x * 10), faceY - 15, 15, 22, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.ellipse(faceX + 45 + (mouse.x * 10), faceY - 15, 15, 22, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.shadowBlur = 0; 
+
+                // Mouth
+                if (now > mouthUntil) mouthMode = 'smile';
+                ctx.strokeStyle = eyeColor;
+                ctx.lineWidth = 7;
+                const baseY = faceY + 30;
+                if (mouthMode === 'sad') {
+                    ctx.beginPath(); ctx.moveTo(faceX - 35, baseY + 15);
+                    ctx.quadraticCurveTo(faceX, baseY - 10, faceX + 35, baseY + 15); ctx.stroke();
+                } else if (mouthMode === 'wow') {
+                    ctx.beginPath(); ctx.arc(faceX, baseY + 10, 12, 0, Math.PI * 2); ctx.stroke();
+                } else {
+                    const depth = (isLaughing ? 25 : 18);
+                    ctx.beginPath(); ctx.moveTo(faceX - 35, baseY);
+                    ctx.quadraticCurveTo(faceX, baseY + depth, faceX + 35, baseY); ctx.stroke();
+                }
+
+                requestAnimationFrame(draw);
+            }
+
+            draw();
+
+            canvas.addEventListener('click', () => {
+                const now = Date.now();
+                if (now - lastClick > 1500) clickCount = 0;
+                clickCount++;
+                lastClick = now;
+
+                if (clickCount >= 8) {
+                    collapseUntil = now + 1200;
+                    clickCount = 0;
+                    canvas.classList.add('robot-canvas-collapse');
+                    setTimeout(() => {
+                        canvas.classList.remove('robot-canvas-collapse');
+                        canvas.classList.add('robot-canvas-reappear');
+                        emitBubbles(20, 'burst');
+                        setTimeout(() => canvas.classList.remove('robot-canvas-reappear'), 600);
+                    }, 1200);
+                    emitPop('System Shutdown!', 1400);
+                } else if (clickCount >= 5) {
+                    angryUntil = now + 1500; mouthMode = 'sad'; mouthUntil = now + 1500;
+                    emitBubbles(10, 'angry'); emitPop('Halt!', 1500);
+                } else {
+                    laughUntil = now + 1200; mouthMode = 'wow'; mouthUntil = now + 1200;
+                    emitBubbles(6); emitPop('Query logged.', 1200);
+                }
+            });
+
+            function emitPop(text, duration) {
+                const hook = document.getElementById('robot-hook');
+                const pop = document.createElement('span');
+                pop.className = 'robot-pop'; pop.textContent = text;
+                hook.appendChild(pop); setTimeout(() => pop.remove(), duration);
+            }
+
+            function emitBubbles(count, tone) {
+                const hook = document.getElementById('robot-hook');
+                for (let i = 0; i < count; i++) {
+                    const bubble = document.createElement('span');
+                    bubble.className = tone === 'angry' ? 'robot-bubble robot-bubble-angry' : 'robot-bubble';
+                    bubble.style.left = `${45 + Math.random() * 10}%`;
+                    bubble.style.top = `${45 + Math.random() * 10}%`;
+                    hook.appendChild(bubble); setTimeout(() => bubble.remove(), 900);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

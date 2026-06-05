@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Document Tampering Detection</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --text:#eaf0ff;
+      --muted:#a9b6dd;
+      --border:rgba(255,255,255,.08);
+      --accent:#6ee7ff;
+      --accent2:#8b5cf6;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --shadow2: 0 35px 90px rgba(0,0,0,.65);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 900px at 18% 0%, rgba(139,92,246,.22), transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, rgba(110,231,255,.20), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 100%); margin:0 auto; padding:0 20px;}
+    header{
+      position:sticky;top:0;z-index:200;
+      backdrop-filter: blur(16px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 0;gap:16px;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:42px;height:42px;border-radius:16px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.16));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 0 55px rgba(110,231,255,.18);
+    }
+    .logo i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .nav a.btn{
+      padding:10px 14px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      font-weight:900;
+    }
+
+    .page{padding:32px 0 50px;}
+    .title{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      gap:16px;flex-wrap:wrap;
+    }
+    h1{margin:0;font-size:clamp(1.8rem, 3vw, 2.4rem);letter-spacing:-.03em;}
+    p{color:var(--muted);line-height:1.7;margin:10px 0 0;max-width:90ch;}
+
+    .grid{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute;inset:-90px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(110,231,255,.16), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.16), transparent 60%);
+      filter: blur(22px);
+      opacity:.65;
+      z-index:0;
+    }
+    .card *{position:relative;z-index:1;}
+
+    .pill{
+      padding:7px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:.84rem;font-weight:800;
+      width:max-content;
+    }
+
+    .uploadRow{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .drop{
+      border-radius:18px;
+      border:1px dashed rgba(255,255,255,.14);
+      background: rgba(255,255,255,.02);
+      padding:18px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      color: rgba(232,240,255,.55);
+      min-height: 220px;
+    }
+
+    .btn{
+      margin-top:14px;
+      padding:13px 16px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:#eaffff;font-weight:900;
+      cursor:pointer;
+      display:inline-flex;align-items:center;gap:10px;
+      transition: transform .2s ease, border .2s ease;
+    }
+    .btn:hover{transform: translateY(-2px);border-color: rgba(110,231,255,.35);}
+    .btn.primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#070a12;border-color:transparent;
+    }
+
+    .outputs{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+
+    .map{
+      height:220px;
+      border-radius:18px;
+      border:1px dashed rgba(255,255,255,.14);
+      background: rgba(255,255,255,.02);
+      display:grid;
+      place-items:center;
+      text-align:center;
+      color: rgba(232,240,255,.55);
+      padding:14px;
+    }
+
+    .risk{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+
+    .kpi{
+      padding:14px;border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .kpi b{
+      display:block;font-size:1.7rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .kpi span{display:block;color:var(--muted);margin-top:6px;line-height:1.4;}
+
+    .bar{
+      margin-top:12px;
+      height:14px;border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, #6ee7ff, #8b5cf6, #ff4fd8);
+      transition: width 1s ease;
+    }
+
+    .evidence{
+      margin-top:14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      padding:14px;
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    @media(max-width:980px){
+      .uploadRow{grid-template-columns:1fr}
+      .outputs{grid-template-columns:1fr}
+      .risk{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+          <div style="font-weight:900;">Tampering Detection</div>
+          <div style="color:rgba(232,240,255,.65);font-size:.92rem;">Demo Interface</div>
+        </div>
+      </div>
+      <a class="btn" href="{{ url_for('usecases') }}">
+    <i class="fa-solid fa-arrow-left"></i> Back
+</a>
+    </div>
+  </div>
+</header>
+
+<section class="page">
+  <div class="container">
+    <div class="title">
+      <div>
+        <h1>Document Tampering Detection (ELA + Multi-Signal Fusion)</h1>
+        <p>
+          This demo interface shows how multiple forensic maps (ELA, Noise, Edge mismatch) can be combined
+          to produce a final tamper confidence score. Static UI now — backend integration later.
+        </p>
+      </div>
+      <span class="pill">Unstructured Data</span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="pill">Upload + Analyze</div>
+
+        <div class="uploadRow">
+          <div>
+            <div class="drop" id="drop">
+              <div>
+                <div style="font-size:2rem; margin-bottom:10px;">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                Drag & drop a PDF / JPG / PNG here<br/>
+                or click “Use Sample”
+              </div>
+            </div>
+
+            <button class="btn primary" id="sampleBtn">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Use Sample Tampered File
+            </button>
+
+            <button class="btn" id="analyzeBtn">
+              <i class="fa-solid fa-magnifying-glass"></i> Analyze Document
+            </button>
+          </div>
+
+          <div>
+            <div class="pill">Selected Variant</div>
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn" id="v1"><i class="fa-solid fa-fire"></i> Heatmap Variant 1</button>
+              <button class="btn" id="v2"><i class="fa-solid fa-bolt"></i> Heatmap Variant 2</button>
+              <button class="btn" id="fusion"><i class="fa-solid fa-layer-group"></i> Final Fusion</button>
+            </div>
+
+            <div class="evidence" id="variantInfo" style="margin-top:14px;">
+              Select a heatmap variant to preview the demo output style.
+            </div>
+          </div>
+        </div>
+
+        <div class="outputs">
+          <div class="map" id="map1">ELA Output (placeholder)</div>
+          <div class="map" id="map2">Noise Map (placeholder)</div>
+          <div class="map" id="map3">Edge Mismatch (placeholder)</div>
+        </div>
+
+        <div class="risk">
+          <div class="kpi">
+            <b id="conf">--%</b>
+            <span>Tamper Confidence</span>
+          </div>
+          <div class="kpi">
+            <b id="risk">--</b>
+            <span>Risk Level</span>
+          </div>
+          <div class="kpi">
+            <b id="signals">--</b>
+            <span>Signals Triggered</span>
+          </div>
+        </div>
+
+        <div class="bar"><div class="fill" id="fill"></div></div>
+
+        <div class="evidence" id="evidence">
+          Upload a file (demo) and click Analyze to generate evidence.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const drop = document.getElementById("drop");
+  const sampleBtn = document.getElementById("sampleBtn");
+  const analyzeBtn = document.getElementById("analyzeBtn");
+
+  const conf = document.getElementById("conf");
+  const risk = document.getElementById("risk");
+  const signals = document.getElementById("signals");
+  const fill = document.getElementById("fill");
+  const evidence = document.getElementById("evidence");
+
+  const map1 = document.getElementById("map1");
+  const map2 = document.getElementById("map2");
+  const map3 = document.getElementById("map3");
+
+  const v1 = document.getElementById("v1");
+  const v2 = document.getElementById("v2");
+  const fusion = document.getElementById("fusion");
+  const variantInfo = document.getElementById("variantInfo");
+
+  let currentVariant = "fusion";
+  let uploaded = false;
+
+  function setVariant(v){
+    currentVariant = v;
+    if(v === "v1"){
+      variantInfo.innerHTML = `
+        <b style="color:#eaffff;">Heatmap Variant 1:</b><br/>
+        • Aggressive ELA amplification<br/>
+        • Stronger tamper highlight<br/>
+        • Best for obvious edits
+      `;
+    }else if(v === "v2"){
+      variantInfo.innerHTML = `
+        <b style="color:#eaffff;">Heatmap Variant 2:</b><br/>
+        • Smooth blended anomaly map<br/>
+        • Better for subtle edits<br/>
+        • More presentation-friendly
+      `;
+    }else{
+      variantInfo.innerHTML = `
+        <b style="color:#eaffff;">Final Fusion:</b><br/>
+        • Combines ELA + Noise + Edge mismatch<br/>
+        • Produces final confidence and risk score
+      `;
+    }
+  }
+
+  v1.addEventListener("click", () => setVariant("v1"));
+  v2.addEventListener("click", () => setVariant("v2"));
+  fusion.addEventListener("click", () => setVariant("fusion"));
+
+  sampleBtn.addEventListener("click", () => {
+    uploaded = true;
+    drop.innerHTML = `
+      <div>
+        <b style="color:#eaffff;">Tampered_Discharge_Summary.png</b><br/>
+        <span style="color:rgba(232,240,255,.55);">Uploaded successfully (demo)</span>
+      </div>
+    `;
+  });
+
+  analyzeBtn.addEventListener("click", () => {
+    if(!uploaded){
+      drop.style.borderColor = "rgba(255,79,216,.35)";
+      drop.innerHTML = `
+        <div>
+          <b style="color:#ffb4e8;">No file uploaded</b><br/>
+          <span style="color:rgba(232,240,255,.55);">Click “Use Sample” first (demo)</span>
+        </div>
+      `;
+      return;
+    }
+
+    let score = 84;
+    let sig = 4;
+
+    if(currentVariant === "v1"){ score = 88; sig = 5; }
+    if(currentVariant === "v2"){ score = 79; sig = 4; }
+
+    let lvl = "LOW";
+    if(score >= 80) lvl = "HIGH";
+    else if(score >= 55) lvl = "MEDIUM";
+
+    conf.textContent = score + "%";
+    risk.textContent = lvl;
+    signals.textContent = sig + "/6";
+    fill.style.width = score + "%";
+
+    map1.innerHTML = `<b style="color:#eaffff;">ELA</b><br/><span style="color:rgba(232,240,255,.55);">(generated)</span>`;
+    map2.innerHTML = `<b style="color:#eaffff;">Noise</b><br/><span style="color:rgba(232,240,255,.55);">(generated)</span>`;
+    map3.innerHTML = `<b style="color:#eaffff;">Edges</b><br/><span style="color:rgba(232,240,255,.55);">(generated)</span>`;
+
+    evidence.innerHTML = `
+      <b style="color:#eaffff;">Evidence Summary:</b><br/>
+      • Compression inconsistency found in edited region.<br/>
+      • Noise residual mismatch across text area.<br/>
+      • Edge discontinuity detected near stamp/signature.<br/>
+      • Multi-signal fusion indicates tampering.
+    `;
+  });
+
+  setVariant("fusion");
+</script>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+domains:
+- domain: kantaka-sodhana.app
+  type: PRIMARY
+envs:
+- key: FLASK_AUTH_URL
+  scope: RUN_AND_BUILD_TIME
+  value: http://kantaka-auth:8080
+- key: FORGERY_API_URL
+  scope: RUN_AND_BUILD_TIME
+  value: http://doc-forgery:8080
+- key: DUP_TAMPER_URL
+  scope: RUN_AND_BUILD_TIME
+  value: http://dup-tamper:8080
+- key: QR_VERIFY_URL
+  scope: RUN_AND_BUILD_TIME
+  value: http://qr-verify:8080
+- key: DATABASE_URL
+  scope: RUN_AND_BUILD_TIME
+  value: postgresql://postgres.tdpsbamtqmpadebdlpar:VKqnEeAUr6P2WNgt@aws-1-ap-south-1.pooler.supabase.com:5432/postgres
+- key: SECRET_KEY
+  scope: RUN_AND_BUILD_TIME
+  value: kantaka_dev_secret_2024
+- key: FLASK_DEBUG
+  scope: RUN_AND_BUILD_TIME
+  value: "false"
+- key: FLASK_ENV
+  scope: RUN_AND_BUILD_TIME
+  value: production
+- key: NEXT_PUBLIC_SUPABASE_URL
+  scope: RUN_AND_BUILD_TIME
+  value: https://tdpsbamtqmpadebdlpar.supabase.co
+- key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+  scope: RUN_AND_BUILD_TIME
+  value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkcHNiYW10cW1wYWRlYmRscGFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzg0MzgsImV4cCI6MjA4NzIxNDQzOH0.N5MgOjG9g8oAlTQgQeAzHWXFcypjJeci9L0qtFvxlCY
+features:
+- buildpack-stack=ubuntu-22
+ingress:
+  rules:
+  - component:
+      name: web-frontend
+    match:
+      path:
+        prefix: /
+name: hammerhead-app
+region: blr
+services:
+- build_command: npm install --legacy-peer-deps && npm run build
+  environment_slug: node-js
+  envs:
+  - key: NODE_VERSION
+    scope: BUILD_TIME
+    value: "22"
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: 2023mt13032-bits/kanta-sodhana-web-app
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-1gb-fixed
+  name: web-frontend
+  run_command: npx next start --port 8080
+  source_dir: /
+- environment_slug: python
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: 2023mt13032-bits/kanta-sodhana-web-app
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  internal_ports:
+  - 8080
+  name: risk-scoring
+  run_command: uvicorn main:app --host 0.0.0.0 --port 8080
+  source_dir: /backend
+- environment_slug: python
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: 2023mt13032-bits/kanta-sodhana-web-app
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  internal_ports:
+  - 8080
+  name: doc-forgery
+  run_command: uvicorn main:app --host 0.0.0.0 --port 8080
+  source_dir: /services/doc-forgery
+- environment_slug: python
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: 2023mt13032-bits/kanta-sodhana-web-app
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  internal_ports:
+  - 8080
+  name: dup-tamper
+  run_command: uvicorn main:app --host 0.0.0.0 --port 8080
+  source_dir: /services/dup-tamper
+- environment_slug: python
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: 2023mt13032-bits/kanta-sodhana-web-app
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  internal_ports:
+  - 8080
+  name: qr-verify
+  run_command: uvicorn main:app --host 0.0.0.0 --port 8080
+  source_dir: /services/qr-verify
+- environment_slug: python
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: 2023mt13032-bits/kanta-sodhana-web-app
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-1gb-fixed
+  internal_ports:
+  - 8080
+  name: kantaka-auth
+  run_command: gunicorn app:app --bind 0.0.0.0:8080 --workers 2
+  source_dir: /services/kantaka-auth

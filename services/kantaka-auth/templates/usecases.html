@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kantaka Śodhana — Use Cases</title>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --panel:#0d1220;
+      --text:#eaf0ff;
+      --muted:#a9b6dd;
+      --border:rgba(255,255,255,.08);
+      --accent:#6ee7ff;
+      --accent2:#8b5cf6;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --shadow2: 0 35px 90px rgba(0,0,0,.65);
+      --radius:22px;
+      --glow: 0 0 55px rgba(110,231,255,.18);
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 900px at 18% 0%, rgba(139,92,246,.22), transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, rgba(110,231,255,.20), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 100%); margin:0 auto; padding:0 20px;}
+
+    /* ===== Header ===== */
+    header{
+      position:sticky;
+      top:0;
+      z-index:200;
+      backdrop-filter: blur(16px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 0;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:260px;
+    }
+
+    .logo{
+      width:42px;height:42px;border-radius:16px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.16));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--glow);
+    }
+    .logo i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-size:1.15rem;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:1.05rem;
+      letter-spacing:-.01em;
+      line-height:1.1;
+    }
+
+    .brand span{
+      display:block;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    .navlinks{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .navlinks a{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      color:var(--muted);
+      font-size:.92rem;
+      transition: transform .2s ease, border .2s ease, background .2s ease;
+    }
+
+    .navlinks a:hover{
+      transform: translateY(-2px);
+      border-color: rgba(110,231,255,.35);
+      background: rgba(255,255,255,.04);
+      color: #eaffff;
+    }
+
+    .navlinks a.primary{
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.14));
+      border-color: rgba(255,255,255,.10);
+      color:#eaffff;
+    }
+
+    /* ===== Hero ===== */
+    .hero{
+      padding: 58px 0 20px;
+    }
+
+    .hero h2{
+      margin:0;
+      font-size: clamp(2.1rem, 3.4vw, 3.1rem);
+      letter-spacing:-.03em;
+      line-height:1.05;
+    }
+
+    .hero p{
+      margin:12px 0 0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width: 78ch;
+      font-size:1.05rem;
+    }
+
+    /* ===== Filter ===== */
+    .filters{
+      margin-top:22px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .filter-btn{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      cursor:pointer;
+      font-weight:800;
+      transition: transform .2s ease, border .2s ease, background .2s ease;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .filter-btn:hover{
+      transform: translateY(-2px);
+      border-color: rgba(110,231,255,.35);
+      background: rgba(255,255,255,.05);
+      color:#eaffff;
+    }
+
+    .filter-btn.active{
+      background: linear-gradient(135deg, rgba(110,231,255,.18), rgba(139,92,246,.18));
+      border-color: rgba(255,255,255,.14);
+      color:#eaffff;
+    }
+
+    /* ===== Cards ===== */
+    .grid{
+      margin-top:26px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      transition: transform .18s ease, box-shadow .2s ease, border .2s ease;
+    }
+
+    .card:hover{
+      transform: translateY(-6px);
+      box-shadow: var(--shadow2);
+      border-color: rgba(110,231,255,.22);
+    }
+
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-90px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(110,231,255,.16), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.16), transparent 60%);
+      filter: blur(22px);
+      opacity:.65;
+      z-index:0;
+    }
+
+    .card *{position:relative; z-index:1;}
+
+    .card-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .icon{
+      width:48px;height:48px;border-radius:18px;
+      display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      flex-shrink:0;
+    }
+    .icon i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-size:1.2rem;
+    }
+
+    .card h3{
+      margin:0;
+      font-size:1.12rem;
+      letter-spacing:-.01em;
+      line-height:1.25;
+    }
+
+    .card p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:.98rem;
+      min-height: 70px;
+    }
+
+    .meta{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .pill{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      font-size:.86rem;
+      color:#dbe7ff;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .pill .dot{
+      width:8px;height:8px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 18px rgba(110,231,255,.35);
+    }
+
+    .explore{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      font-weight:900;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      transition: transform .2s ease, border .2s ease, background .2s ease;
+    }
+
+    .explore:hover{
+      transform: translateY(-2px);
+      border-color: rgba(110,231,255,.35);
+      background: rgba(255,255,255,.06);
+    }
+
+    /* ===== Footer ===== */
+    footer{
+      margin-top:55px;
+      padding:42px 0 28px;
+      border-top:1px solid rgba(255,255,255,.06);
+      color:var(--muted);
+    }
+
+    .footer-grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .footlinks{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+    }
+
+    .footlinks a{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    /* ===== Reveal ===== */
+    .reveal{
+      opacity:0;
+      transform: translateY(28px);
+      filter: blur(7px);
+      transition: opacity .75s ease, transform .75s ease, filter .75s ease;
+    }
+    .reveal.show{
+      opacity:1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .footer-grid{grid-template-columns:1fr}
+      .nav{flex-wrap:wrap}
+      .navlinks{justify-content:flex-start}
+      .footlinks{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="{{ url_for('index') }}">
+          <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <h1>Kantaka Śodhana</h1>
+            <span>Fraud & Tampering Detection</span>
+          </div>
+        </a>
+
+        <nav class="navlinks">
+    <a href="{{ url_for('index') }}">Overview</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('usecases') }}">Use Cases</a>
+        <a href="{{ url_for('mlops') }}">MLOps</a>
+        <a href="{{ url_for('architecture') }}">Architecture</a>
+        
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('admin_panel') }}" style="border: 1px solid #8b5cf6;">Admin Panel</a>
+        {% endif %}
+        
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="explore" style="box-shadow: 0 0 20px rgba(110,231,255,0.4);">
+            <i class="fa-solid fa-lock"></i> Dashboard Login
+        </a>
+    {% endif %}
+</nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="reveal">
+        <h2>Use Cases </h2>
+        <p>
+          These demo modules show how Kantaka Tamper detects fraud patterns from structured data
+          and suspicious manipulation from unstructured documents — with explainable outputs.
+        </p>
+
+        <!-- FILTERS -->
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">
+            <i class="fa-solid fa-border-all"></i> All
+          </button>
+          <button class="filter-btn" data-filter="structured">
+            <i class="fa-solid fa-table"></i> Structured Data
+          </button>
+          <button class="filter-btn" data-filter="unstructured">
+            <i class="fa-solid fa-file-lines"></i> Unstructured Data
+          </button>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <div class="grid" id="cardsGrid">
+
+        <!-- 11.2 (Structured) -->
+        <div class="card reveal" data-type="structured">
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-hospital-user"></i></div>
+            <h3>Same-Day Admission–Discharge Fraud</h3>
+          </div>
+          <p>
+            Detect suspicious claims where admission and discharge occur on the same date,
+            indicating potential inflated billing or fake hospitalization.
+          </p>
+          <div class="meta">
+            <div class="pill"><span class="dot"></span> Structured</div>
+            <a class="explore" href="#">
+              Explore <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="card reveal" data-type="structured">
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-people-group"></i></div>
+            <h3>Family Member Admission Cluster Detection</h3>
+          </div>
+          <p>
+            Identify unusual patterns where multiple family members are admitted within
+            short windows, suggesting coordinated fraud.
+          </p>
+          <div class="meta">
+            <div class="pill"><span class="dot"></span> Structured</div>
+            <a class="explore" href="#">
+              Explore <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="card reveal" data-type="structured">
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-chart-line"></i></div>
+            <h3>Provider Risk Scoring Mechanism</h3>
+          </div>
+          <p>
+            Assign a risk score to hospitals/providers based on fraud indicators,
+            claim anomalies, and historical suspicious patterns.
+          </p>
+          <div class="meta">
+            <div class="pill"><span class="dot"></span> Structured</div>
+            <a class="explore" href="#">
+              Explore <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 11.3 (Unstructured) -->
+        <div class="card reveal" data-type="unstructured">
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-copy"></i></div>
+            <h3>Document Duplication & Tampering Detection</h3>
+          </div>
+          <p>
+            Detect duplicate claim documents even if resized, re-exported, rotated,
+            or lightly modified to bypass simple checks. Detect Tampered docuuments ,where it is tampered
+          </p>
+          <div class="meta">
+            <div class="pill"><span class="dot"></span> Unstructured</div>
+            <a class="explore" href="#">
+              Explore <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="card reveal" data-type="unstructured">
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3>Death Certificate QR Extraction</h3>
+          </div>
+          <p>
+            Extract data from the portal that is redirected from the QR detected on the death certificate.
+          </p>
+          <div class="meta">
+            <div class="pill"><span class="dot"></span> Unstructured</div>
+            <a class="explore" href="#">
+              Explore <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="card reveal" data-type="unstructured">
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-id-card"></i></div>
+            <h3>Face Recognition Identity Verification</h3>
+          </div>
+          <p>
+            Compare identity documents vs selfies or stored profiles to detect impersonation,
+            mismatched identities, and forged claims.
+          </p>
+          <div class="meta">
+            <div class="pill"><span class="dot"></span> Unstructured</div>
+            <a class="explore" href="#">
+              Explore <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+              <div style="font-weight:900;color:#eaffff;">Kantaka Tamper</div>
+              <div style="color:var(--muted);margin-top:2px;">Use Case Demonstrations</div>
+            </div>
+          </div>
+
+          <div style="color:var(--muted); line-height:1.65;">
+            A modern UI showcasing structured fraud detection + unstructured forensic analysis.
+          </div>
+
+          <div style="margin-top:14px;font-size:.92rem;opacity:.9;">
+            © <span id="year"></span> Kantaka Tamper. All rights reserved.
+          </div>
+        </div>
+
+        <div class="footlinks">
+          <a href="index.html">Overview</a>
+          <a href="usecases.html">Use Cases</a>
+          <a href="mlops.html">Pipeline</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // reveal
+    const reveals = [...document.querySelectorAll(".reveal")];
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) entry.target.classList.add("show");
+      });
+    }, { threshold: 0.14 });
+    reveals.forEach(el => io.observe(el));
+
+    // filters
+    const buttons = document.querySelectorAll(".filter-btn");
+    const cards = document.querySelectorAll(".card");
+
+    function setFilter(filter){
+      buttons.forEach(b => b.classList.remove("active"));
+      document.querySelector(`[data-filter="${filter}"]`).classList.add("active");
+
+      cards.forEach(card => {
+        const type = card.dataset.type;
+        const show = (filter === "all") || (type === filter);
+        card.style.display = show ? "block" : "none";
+      });
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        setFilter(btn.dataset.filter);
+      });
+    });
+  </script>
+
+</body>
+</html>
+
+

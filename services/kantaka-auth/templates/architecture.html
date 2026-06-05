@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kantaka Śodhana — Architecture</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --panel:#0d1220;
+      --panel2:#0b1020;
+      --text:#eaf0ff;
+      --muted:#a9b6dd;
+      --border:rgba(255,255,255,.08);
+      --accent:#6ee7ff;
+      --accent2:#8b5cf6;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --shadow2: 0 35px 90px rgba(0,0,0,.65);
+      --glow: 0 0 55px rgba(110,231,255,.18);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 900px at 18% 0%, rgba(139,92,246,.22), transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, rgba(110,231,255,.20), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 100%); margin:0 auto; padding:0 20px;}
+
+    .top-progress{
+      position:fixed;
+      top:0;left:0;
+      height:4px;
+      width:0%;
+      background:linear-gradient(90deg, var(--accent), var(--accent2));
+      z-index:999;
+      box-shadow:0 0 25px rgba(110,231,255,.25);
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:200;
+      backdrop-filter: blur(16px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 0;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:260px;
+    }
+
+    .logo{
+      width:42px;height:42px;border-radius:16px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.16));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--glow);
+    }
+    .logo i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-size:1.15rem;
+    }
+
+    .brand h1{margin:0;font-size:1.05rem;letter-spacing:-.01em;line-height:1.1;}
+    .brand span{display:block;margin-top:2px;color:var(--muted);font-size:.86rem;}
+
+    .navlinks{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .navlinks a{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      color:var(--muted);
+      font-size:.92rem;
+      transition: transform .2s ease, border .2s ease, background .2s ease;
+    }
+
+    .navlinks a:hover{
+      transform: translateY(-2px);
+      border-color: rgba(110,231,255,.35);
+      background: rgba(255,255,255,.04);
+      color: #eaffff;
+    }
+
+    .navlinks a.primary{
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.14));
+      border-color: rgba(255,255,255,.10);
+      color:#eaffff;
+    }
+
+    .navlinks a.explore{
+      font-weight:900;
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(139,92,246,.22));
+      border-color: rgba(255,255,255,.10);
+      color:#eaffff;
+      box-shadow: 0 0 35px rgba(110,231,255,.14);
+    }
+
+    @media (max-width: 980px){
+      .brand{min-width:auto}
+      .nav{flex-wrap:wrap}
+      .navlinks{justify-content:flex-start}
+    }
+
+    .hero{padding:54px 0 20px;}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      width:max-content;
+      backdrop-filter: blur(10px);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 20px rgba(110,231,255,.45);
+    }
+    h2{
+      margin:14px 0 10px;
+      font-size: clamp(2.1rem, 4vw, 3.1rem);
+      letter-spacing:-.03em;
+      line-height:1.05;
+    }
+    .lead{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:85ch;
+      font-size:1.05rem;
+    }
+
+    .section{padding:32px 0 10px;}
+
+    .grid2{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      align-items:stretch;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      transform-style:preserve-3d;
+      transition: transform .18s ease, box-shadow .2s ease;
+      min-height: 220px;
+    }
+
+    .card:hover{box-shadow: var(--shadow2);}
+
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-90px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(110,231,255,.14), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.14), transparent 60%);
+      filter: blur(22px);
+      opacity:.65;
+      z-index:0;
+    }
+    .card *{position:relative; z-index:1;}
+
+    .icon{
+      width:46px;height:46px;border-radius:18px;
+      display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      margin-bottom:10px;
+    }
+    .icon i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-size:1.15rem;
+    }
+
+    .card h4{margin:0;font-size:1.1rem}
+    .card p{margin:10px 0 0;color:var(--muted);line-height:1.6}
+
+    @media (max-width: 980px){
+      .grid2{grid-template-columns:1fr}
+    }
+
+    .diagram{
+      margin-top:16px;
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow2);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .diagram:before{
+      content:"";
+      position:absolute;
+      inset:-90px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(110,231,255,.14), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.14), transparent 60%);
+      filter: blur(22px);
+      opacity:.6;
+      z-index:0;
+    }
+    .diagram *{position:relative; z-index:1;}
+
+    .flow{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap:10px;
+    }
+
+    .step{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      padding:14px;
+      min-height:110px;
+      transition: transform .2s ease, background .2s ease;
+    }
+    .step:hover{
+      transform: translateY(-4px);
+      background: rgba(255,255,255,.06);
+    }
+
+    .step b{display:block}
+    .step span{display:block;margin-top:6px;color:var(--muted);line-height:1.5;font-size:.92rem}
+
+    @media (max-width: 980px){
+      .flow{grid-template-columns:1fr}
+    }
+
+    .reveal{
+      opacity:0;
+      transform: translateY(28px);
+      filter: blur(7px);
+      transition: opacity .75s ease, transform .75s ease, filter .75s ease;
+    }
+    .reveal.show{
+      opacity:1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    footer{
+      margin-top:55px;
+      padding:30px 0;
+      border-top:1px solid rgba(255,255,255,.06);
+      color:var(--muted);
+      text-align:center;
+      font-size:.92rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-progress" id="topProgress"></div>
+
+  <header>
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="{{ url_for('index') }}">
+          <div class="logo"><i class="fa-solid fa-robot"></i></div>
+          <div>
+            <h1>Kantaka Śodhana</h1>
+            <span>Architecture</span>
+          </div>
+        </a>
+
+        <nav class="navlinks">
+    <a href="{{ url_for('index') }}">Overview</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('usecases') }}">Use Cases</a>
+        <a href="{{ url_for('mlops') }}">MLOps</a>
+        <a href="{{ url_for('architecture') }}">Architecture</a>
+        
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('admin_panel') }}" style="border: 1px solid #8b5cf6;">Admin Panel</a>
+        {% endif %}
+        
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="explore" style="box-shadow: 0 0 20px rgba(110,231,255,0.4);">
+            <i class="fa-solid fa-lock"></i> Dashboard Login
+        </a>
+    {% endif %}
+</nav>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="badge reveal">
+        <div class="dot"></div>
+        <span>Open-source core • scalable • enterprise-ready</span>
+      </div>
+
+      <h2 class="reveal">Reference Architecture</h2>
+      <p class="lead reveal">
+        A clean architecture for an end-to-end MLOps platform:
+        ingestion → validation → features → training → registry → deployment → monitoring → retraining.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="arch">
+    <div class="container">
+
+      <div class="grid2">
+        <div class="card reveal" data-tilt>
+          <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
+          <h4>Data Layer</h4>
+          <p>
+            Data lake / warehouse, ingestion pipelines, data validation, and dataset versioning.
+          </p>
+        </div>
+
+        <div class="card reveal" data-tilt>
+          <div class="icon"><i class="fa-solid fa-cubes"></i></div>
+          <h4>Feature Layer</h4>
+          <p>
+            Feature engineering pipelines + feature store to ensure training-serving consistency.
+          </p>
+        </div>
+
+        <div class="card reveal" data-tilt>
+          <div class="icon"><i class="fa-solid fa-brain"></i></div>
+          <h4>Model Layer</h4>
+          <p>
+            Training jobs, experiment tracking, hyperparameter tuning, and model registry.
+          </p>
+        </div>
+
+        <div class="card reveal" data-tilt>
+          <div class="icon"><i class="fa-solid fa-rocket"></i></div>
+          <h4>Serving Layer</h4>
+          <p>
+            Deployment (batch + real-time), inference APIs, routing strategies and rollback.
+          </p>
+        </div>
+      </div>
+
+      <div class="diagram reveal">
+        <h3 style="margin:0;font-size:1.25rem;letter-spacing:-.01em">
+          High-Level Flow (Simplified)
+        </h3>
+        <p style="margin:10px 0 0;color:var(--muted);line-height:1.65;max-width:90ch">
+          This is a clean view of how components connect. In your UI we can later replace this
+          with a real flowchart SVG — but for now it stays product-style and readable.
+        </p>
+
+        <div class="flow">
+          <div class="step">
+            <b><i class="fa-solid fa-plug"></i> Ingestion</b>
+            <span>Kafka, Airflow, NiFi</span>
+          </div>
+          <div class="step">
+            <b><i class="fa-solid fa-shield-check"></i> Validation</b>
+            <span>Great Expectations, TFDV</span>
+          </div>
+          <div class="step">
+            <b><i class="fa-solid fa-cubes"></i> Features</b>
+            <span>Feast, dbt, Spark</span>
+          </div>
+          <div class="step">
+            <b><i class="fa-solid fa-brain"></i> Training</b>
+            <span>PyTorch, Ray, Kubeflow</span>
+          </div>
+          <div class="step">
+            <b><i class="fa-solid fa-rocket"></i> Deploy</b>
+            <span>KServe, Seldon, Triton</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      © 2026 Kantaka Śodhana • Architecture • Designed for MLOps scalability
+    </div>
+  </footer>
+
+  <script>
+    const topProgress = document.getElementById("topProgress");
+
+    function updateProgress(){
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      const p = Math.max(0, Math.min(1, scrollTop / scrollHeight));
+      topProgress.style.width = (p * 100) + "%";
+    }
+    window.addEventListener("scroll", updateProgress, { passive:true });
+    updateProgress();
+
+    const reveals = [...document.querySelectorAll(".reveal")];
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) entry.target.classList.add("show");
+      });
+    }, { threshold: 0.14 });
+    reveals.forEach(el => io.observe(el));
+
+    const tilts = document.querySelectorAll("[data-tilt]");
+    tilts.forEach(card => {
+      card.addEventListener("mousemove", (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        const rx = (y - 0.5) * -10;
+        const ry = (x - 0.5) * 12;
+        card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+      });
+      card.addEventListener("mouseleave", () => card.style.transform = "");
+    });
+  </script>
+</body>
+</html>

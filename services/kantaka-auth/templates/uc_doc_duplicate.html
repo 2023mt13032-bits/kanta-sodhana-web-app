@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Document Duplication Detection</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --text:#eaf0ff;
+      --muted:#a9b6dd;
+      --border:rgba(255,255,255,.08);
+      --accent:#6ee7ff;
+      --accent2:#8b5cf6;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --shadow2: 0 35px 90px rgba(0,0,0,.65);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 900px at 18% 0%, rgba(139,92,246,.22), transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, rgba(110,231,255,.20), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 100%); margin:0 auto; padding:0 20px;}
+    header{
+      position:sticky;top:0;z-index:200;
+      backdrop-filter: blur(16px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 0;gap:16px;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:42px;height:42px;border-radius:16px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.16));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 0 55px rgba(110,231,255,.18);
+    }
+    .logo i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .nav a.btn{
+      padding:10px 14px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      font-weight:900;
+    }
+
+    .page{padding:32px 0 50px;}
+    .title{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      gap:16px;flex-wrap:wrap;
+    }
+    h1{margin:0;font-size:clamp(1.8rem, 3vw, 2.4rem);letter-spacing:-.03em;}
+    p{color:var(--muted);line-height:1.7;margin:10px 0 0;max-width:85ch;}
+
+    .grid{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute;inset:-90px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(110,231,255,.16), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.16), transparent 60%);
+      filter: blur(22px);
+      opacity:.65;
+      z-index:0;
+    }
+    .card *{position:relative;z-index:1;}
+
+    .pill{
+      padding:7px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:.84rem;font-weight:800;
+      width:max-content;
+    }
+
+    .drop{
+      margin-top:14px;
+      border-radius:18px;
+      border:1px dashed rgba(255,255,255,.14);
+      background: rgba(255,255,255,.02);
+      padding:18px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      color: rgba(232,240,255,.55);
+      min-height: 220px;
+    }
+
+    .btn{
+      margin-top:14px;
+      padding:13px 16px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:#eaffff;font-weight:900;
+      cursor:pointer;
+      display:inline-flex;align-items:center;gap:10px;
+      transition: transform .2s ease, border .2s ease;
+    }
+    .btn:hover{transform: translateY(-2px);border-color: rgba(110,231,255,.35);}
+    .btn.primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#070a12;border-color:transparent;
+    }
+
+    .matches{
+      margin-top:14px;
+      display:grid;
+      gap:10px;
+    }
+
+    .match{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      padding:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .match b{
+      color:#eaffff;
+    }
+
+    .score{
+      font-weight:1000;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+
+    @media(max-width:980px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-copy"></i></div>
+        <div>
+          <div style="font-weight:900;">Doc Duplication</div>
+          <div style="color:rgba(232,240,255,.65);font-size:.92rem;">Demo Interface</div>
+        </div>
+      </div>
+      <a class="btn" href="{{ url_for('usecases') }}">
+    <i class="fa-solid fa-arrow-left"></i> Back
+</a>
+    </div>
+  </div>
+</header>
+
+<section class="page">
+  <div class="container">
+    <div class="title">
+      <div>
+        <h1>Document Duplication Detection</h1>
+        <p>
+          This demo simulates similarity search using perceptual hashing + OCR fingerprinting.
+          Output shows potential duplicate documents already submitted.
+        </p>
+      </div>
+      <span class="pill">Unstructured Data</span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="pill">Upload Document</div>
+
+        <div class="drop" id="drop">
+          <div>
+            <div style="font-size:2rem; margin-bottom:10px;">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            Drag & drop a document here<br/>
+            or click “Use Sample”
+          </div>
+        </div>
+
+        <button class="btn primary" id="sampleBtn">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Use Sample Document
+        </button>
+
+        <div style="margin-top:12px;color:var(--muted);line-height:1.6;">
+          Later: connect to database (SHA256 + pHash) for fast lookup.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="pill">Similarity Matches</div>
+
+        <div class="matches" id="matches">
+          <div style="color:rgba(232,240,255,.55);">
+            Upload or use sample to view demo matches.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const sampleBtn = document.getElementById("sampleBtn");
+  const matches = document.getElementById("matches");
+  const drop = document.getElementById("drop");
+
+  sampleBtn.addEventListener("click", () => {
+    drop.innerHTML = `
+      <div>
+        <b style="color:#eaffff;">Sample_Claim_Document.pdf</b><br/>
+        <span style="color:rgba(232,240,255,.55);">Uploaded successfully (demo)</span>
+      </div>
+    `;
+
+    matches.innerHTML = `
+      <div class="match">
+        <div>
+          <b>CLM-39210 • Apollo Hospital</b><br/>
+          <span style="color:rgba(232,240,255,.55);">Matched by OCR + Layout Similarity</span>
+        </div>
+        <div class="score">94%</div>
+      </div>
+
+      <div class="match">
+        <div>
+          <b>CLM-21098 • Sunrise Clinic</b><br/>
+          <span style="color:rgba(232,240,255,.55);">Matched by Perceptual Hash</span>
+        </div>
+        <div class="score">88%</div>
+      </div>
+
+      <div class="match">
+        <div>
+          <b>CLM-14002 • Unknown Provider</b><br/>
+          <span style="color:rgba(232,240,255,.55);">Matched by Template Reuse</span>
+        </div>
+        <div class="score">79%</div>
+      </div>
+    `;
+  });
+</script>
+
+</body>
+</html>

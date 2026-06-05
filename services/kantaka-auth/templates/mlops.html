@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kantaka Śodhana — MLOps Pipeline (Open Source vs Paid)</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --panel:#0d1220;
+      --panel2:#0b1020;
+      --text:#eaf0ff;
+      --muted:#a9b6dd;
+      --border:rgba(255,255,255,.08);
+      --accent:#6ee7ff;
+      --accent2:#8b5cf6;
+      --good:#22c55e;
+      --warn:#fbbf24;
+      --bad:#ef4444;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --shadow2: 0 35px 90px rgba(0,0,0,.65);
+      --glow: 0 0 55px rgba(110,231,255,.18);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 900px at 18% 0%, rgba(139,92,246,.22), transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, rgba(110,231,255,.20), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 100%); margin:0 auto; padding:0 20px;}
+
+    /* ===== Top Progress ===== */
+    .top-progress{
+      position:fixed;
+      top:0;left:0;
+      height:4px;
+      width:0%;
+      background:linear-gradient(90deg, var(--accent), var(--accent2));
+      z-index:999;
+      box-shadow:0 0 25px rgba(110,231,255,.25);
+    }
+
+    /* ===== Header ===== */
+    header{
+      position:sticky;
+      top:0;
+      z-index:200;
+      backdrop-filter: blur(16px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 0;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:260px;
+    }
+
+    .logo{
+      width:42px;height:42px;border-radius:16px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.16));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--glow);
+    }
+    .logo i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-size:1.15rem;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:1.05rem;
+      letter-spacing:-.01em;
+      line-height:1.1;
+    }
+
+    .brand span{
+      display:block;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    .navlinks{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .navlinks a{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      color:var(--muted);
+      font-size:.92rem;
+      transition: transform .2s ease, border .2s ease, background .2s ease;
+    }
+
+    .navlinks a:hover{
+      transform: translateY(-2px);
+      border-color: rgba(110,231,255,.35);
+      background: rgba(255,255,255,.04);
+      color: #eaffff;
+    }
+
+    .navlinks a.primary{
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.14));
+      border-color: rgba(255,255,255,.10);
+      color:#eaffff;
+    }
+
+    .navlinks a.explore{
+      font-weight:900;
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(139,92,246,.22));
+      border-color: rgba(255,255,255,.10);
+      color:#eaffff;
+      box-shadow: 0 0 35px rgba(110,231,255,.14);
+    }
+
+    /* ===== Floating Right Nav (icons only) ===== */
+    .mini-nav{
+      position:fixed;
+      right:18px;
+      top:50%;
+      transform: translateY(-50%);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      z-index:120;
+    }
+
+    .mini-nav a{
+      width:46px;height:46px;
+      display:grid;
+      place-items:center;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(12px);
+      color:var(--muted);
+      transition: transform .2s ease, border .2s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      position:relative;
+    }
+
+    .mini-nav a:hover{
+      transform: translateX(-4px);
+      border-color: rgba(110,231,255,.35);
+      background: rgba(255,255,255,.04);
+      color:#eaffff;
+    }
+
+    .mini-nav a.active{
+      border-color: rgba(110,231,255,.55);
+      box-shadow: var(--glow);
+      color:#eaffff;
+    }
+
+    /* Tooltip */
+    .mini-nav a:after{
+      content: attr(data-tip);
+      position:absolute;
+      right:56px;
+      top:50%;
+      transform: translateY(-50%);
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.40);
+      color:#eaffff;
+      font-size:.86rem;
+      white-space:nowrap;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .mini-nav a:hover:after{
+      opacity:1;
+      transform: translateY(-50%) translateX(-6px);
+    }
+
+    @media (max-width: 980px){
+      .mini-nav{display:none;}
+      .brand{min-width:auto}
+      .nav{flex-wrap:wrap}
+      .navlinks{justify-content:flex-start}
+    }
+
+    /* ===== Hero ===== */
+    .hero{
+      padding:52px 0 30px;
+      position:relative;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      width:max-content;
+      backdrop-filter: blur(10px);
+    }
+
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 20px rgba(110,231,255,.45);
+    }
+
+    h2{
+      margin:14px 0 10px;
+      font-size: clamp(2.1rem, 4vw, 3.1rem);
+      letter-spacing:-.03em;
+      line-height:1.05;
+    }
+
+    .lead{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:85ch;
+      font-size:1.05rem;
+    }
+
+    .hero-grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .hero-card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      min-height: 240px;
+    }
+
+    .hero-card:before{
+      content:"";
+      position:absolute;
+      inset:-90px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(110,231,255,.16), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.16), transparent 60%);
+      filter: blur(22px);
+      opacity:.7;
+      z-index:0;
+    }
+    .hero-card *{position:relative; z-index:1;}
+
+    .tools{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .tool{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      font-size:.9rem;
+      color:#dbe7ff;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .tool span{
+      width:8px;height:8px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 16px rgba(110,231,255,.35);
+    }
+
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns:1fr}
+    }
+
+    /* ===== Timeline Rail (Left) ===== */
+    .rail{
+      position:fixed;
+      left: clamp(14px, 4vw, 42px);
+      top: 50%;
+      transform:translateY(-50%);
+      width: 8px;
+      height: 70vh;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      overflow:hidden;
+      z-index: 60;
+    }
+
+    .rail .fill{
+      width:100%;
+      height:0%;
+      background:linear-gradient(180deg, var(--accent), var(--accent2));
+      border-radius:999px;
+      transition: height .25s ease;
+      box-shadow:0 0 40px rgba(110,231,255,.25);
+    }
+
+    @media (max-width: 980px){
+      .rail{display:none;}
+    }
+
+    /* ===== Wrap ===== */
+    .wrap{
+      width:min(1200px, 100%);
+      margin:0 auto;
+      padding:0 20px 110px;
+      position:relative;
+      z-index:2;
+    }
+
+    /* ===== Phase Sections ===== */
+    section.phase{
+      min-height: 92vh;
+      display:flex;
+      align-items:center;
+      padding: 70px 0;
+      position:relative;
+    }
+
+    .phase-grid{
+      width:100%;
+      display:grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 18px;
+      align-items:start;
+      position:relative;
+      z-index:2;
+    }
+
+    @media (max-width: 980px){
+      section.phase{min-height:auto;padding:55px 0;}
+      .phase-grid{grid-template-columns:1fr}
+    }
+
+    /* Node marker */
+    .node{
+      position:absolute;
+      left: calc(clamp(14px, 4vw, 42px) + 4px);
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width:18px;height:18px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.25);
+      background:rgba(7,10,18,.75);
+      box-shadow:0 0 0 6px rgba(110,231,255,.06);
+      z-index:80;
+      transition: all 0.3s ease;
+    }
+
+    .node.active{
+      border-color: rgba(110,231,255,.9);
+      box-shadow:0 0 0 6px rgba(110,231,255,.10), 0 0 26px rgba(110,231,255,.35);
+      transform: translate(-50%, -50%) scale(1.18);
+    }
+
+    @media (max-width: 980px){
+      .node{display:none;}
+    }
+
+    /* Connector animation */
+    .connector{
+      position:absolute;
+      left: calc(clamp(14px, 4vw, 42px) + 22px);
+      top: 50%;
+      width: 120px;
+      height: 2px;
+      background: rgba(255,255,255,.10);
+      transform: translateY(-50%);
+      border-radius:999px;
+      overflow:hidden;
+      z-index:1;
+    }
+
+    .connector:after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg, transparent, rgba(110,231,255,.6), transparent);
+      transform: translateX(-100%);
+      animation: flow 1.9s linear infinite;
+    }
+
+    @keyframes flow{
+      to{transform: translateX(100%);}
+    }
+
+    @media (max-width: 980px){
+      .connector{display:none;}
+    }
+
+    /* ===== Phase Cards ===== */
+    .phase-card, .table-card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .phase-card:hover, .table-card:hover{
+      transform: translateY(-6px);
+      box-shadow: var(--shadow2);
+    }
+
+    .phase-card:before, .table-card:before{
+      content:"";
+      position:absolute;
+      inset:-90px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(110,231,255,.14), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.14), transparent 60%);
+      filter: blur(22px);
+      opacity:.6;
+      z-index:0;
+    }
+    .phase-card *, .table-card *{position:relative; z-index:1;}
+
+    .kicker{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:var(--muted);
+      font-weight:700;
+      letter-spacing:.02em;
+    }
+
+    .pill{
+      font-size:.85rem;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+    }
+
+    .phase-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:10px 0 8px;
+    }
+
+    .phase-title h3{
+      margin:0;
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      letter-spacing:-.02em;
+    }
+
+    .phase-icon{
+      width:46px;height:46px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+
+    .phase-icon i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-size:1.15rem;
+    }
+
+    .phase-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:1.02rem;
+    }
+
+    .phase-card img{
+      width:100%;
+      border-radius:16px;
+      margin-top:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      transition: transform .25s ease;
+      max-height: 210px;
+      object-fit: cover;
+    }
+
+    .phase-card:hover img{transform: scale(1.03);}
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .chip{
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      font-size:.92rem;
+      color:#dbe7ff;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .chip:hover{
+      background:rgba(255,255,255,.08);
+      transform: translateY(-2px);
+    }
+
+    .chip .tag{
+      width:8px;height:8px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 16px rgba(110,231,255,.35);
+    }
+
+    /* ===== Table ===== */
+    .table-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:14px;
+      margin-bottom:12px;
+    }
+
+    .table-top h4{
+      margin:0;
+      font-size:1.12rem;
+      letter-spacing:-.01em;
+    }
+
+    .table-top span{
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.07);
+    }
+
+    thead th{
+      text-align:left;
+      padding:14px 14px;
+      font-size:.9rem;
+      color:#dbe7ff;
+      background:rgba(255,255,255,.04);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    tbody td{
+      padding:14px 14px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      color:#eaf0ff;
+      vertical-align:top;
+      font-size:.95rem;
+      transition: background .2s ease;
+    }
+
+    tbody tr:hover td{
+      background: rgba(255,255,255,.05);
+    }
+
+    tbody tr:last-child td{border-bottom:none;}
+    .muted{color:var(--muted)}
+    .price{font-weight:900;letter-spacing:-.01em}
+
+    .badge2{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      font-size:.85rem;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .b-good{color:#bbf7d0}
+    .b-warn{color:#fde68a}
+    .b-bad{color:#fecaca}
+
+    /* ===== Reveal ===== */
+    .reveal{
+      opacity:0;
+      transform: translateY(28px);
+      filter: blur(7px);
+      transition: opacity .75s ease, transform .75s ease, filter .75s ease;
+    }
+    .reveal.show{
+      opacity:1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    /* Row stagger */
+    tbody tr{
+      opacity:0;
+      transform: translateY(14px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .table-card.show-rows tbody tr{
+      opacity:1;
+      transform: translateY(0);
+    }
+    .table-card.show-rows tbody tr:nth-child(1){transition-delay:.05s}
+    .table-card.show-rows tbody tr:nth-child(2){transition-delay:.12s}
+    .table-card.show-rows tbody tr:nth-child(3){transition-delay:.19s}
+    .table-card.show-rows tbody tr:nth-child(4){transition-delay:.26s}
+
+    /* ===== Footer ===== */
+    footer{
+      margin-top:55px;
+      padding:30px 0;
+      border-top:1px solid rgba(255,255,255,.06);
+      color:var(--muted);
+      text-align:center;
+      font-size:.92rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-progress" id="topProgress"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="{{ url_for('index') }}">
+          <div class="logo"><i class="fa-solid fa-robot"></i></div>
+          <div>
+            <h1>Kantaka Śodhana</h1>
+            <span>MLOps Pipeline</span>
+          </div>
+        </a>
+
+        <nav class="navlinks">
+    <a href="{{ url_for('index') }}">Overview</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('usecases') }}">Use Cases</a>
+        <a href="{{ url_for('mlops') }}">MLOps</a>
+        <a href="{{ url_for('architecture') }}">Architecture</a>
+        
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('admin_panel') }}" style="border: 1px solid #8b5cf6;">Admin Panel</a>
+        {% endif %}
+        
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="explore" style="box-shadow: 0 0 20px rgba(110,231,255,0.4);">
+            <i class="fa-solid fa-lock"></i> Dashboard Login
+        </a>
+    {% endif %}
+</nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Right side mini nav (icons only) -->
+  <nav class="mini-nav" aria-label="MLOps pipeline steps">
+    <a href="#phase1" data-nav="1" data-tip="Ingestion"><i class="fa-solid fa-plug"></i></a>
+    <a href="#phase2" data-nav="2" data-tip="Validation"><i class="fa-solid fa-shield-check"></i></a>
+    <a href="#phase3" data-nav="3" data-tip="Versioning"><i class="fa-solid fa-code-merge"></i></a>
+    <a href="#phase4" data-nav="4" data-tip="Features"><i class="fa-solid fa-cubes"></i></a>
+    <a href="#phase5" data-nav="5" data-tip="Training"><i class="fa-solid fa-brain"></i></a>
+    <a href="#phase6" data-nav="6" data-tip="Tracking"><i class="fa-solid fa-chart-line"></i></a>
+    <a href="#phase7" data-nav="7" data-tip="Registry"><i class="fa-solid fa-box-archive"></i></a>
+    <a href="#phase8" data-nav="8" data-tip="CI for ML"><i class="fa-solid fa-vial-circle-check"></i></a>
+    <a href="#phase9" data-nav="9" data-tip="Packaging"><i class="fa-solid fa-box"></i></a>
+    <a href="#phase10" data-nav="10" data-tip="Deploy"><i class="fa-solid fa-rocket"></i></a>
+    <a href="#phase11" data-nav="11" data-tip="Monitor"><i class="fa-solid fa-satellite-dish"></i></a>
+    <a href="#phase12" data-nav="12" data-tip="Retrain"><i class="fa-solid fa-arrows-rotate"></i></a>
+  </nav>
+
+  <!-- Timeline rail -->
+  <div class="rail" aria-hidden="true">
+    <div class="fill" id="railFill"></div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="badge reveal">
+        <div class="dot"></div>
+        <span>12-Stage Open-Source First MLOps Pipeline — with Paid Alternatives</span>
+      </div>
+
+      <div class="hero-grid">
+        <div>
+          <h2 class="reveal">MLOps Pipeline — Real Tools, Real Workflow.</h2>
+          <p class="lead reveal">
+            This pipeline covers the full lifecycle:
+            <b>Data → Validation → Versioning → Features → Train → Track → Register → CI → Package → Deploy → Monitor → Retrain</b>.
+            Each stage includes open-source tools + managed enterprise alternatives with price estimates.
+          </p>
+        </div>
+
+        <div class="hero-card reveal">
+          <h3 style="margin:0;font-size:1.15rem">Most Realistic Stack</h3>
+          <p style="margin:10px 0 0;color:var(--muted);line-height:1.65">
+            What companies actually use (Open Source First):
+          </p>
+
+          <div class="tools">
+            <div class="tool"><span></span> Airflow / Kubeflow</div>
+            <div class="tool"><span></span> Great Expectations</div>
+            <div class="tool"><span></span> DVC / lakeFS</div>
+            <div class="tool"><span></span> Feast</div>
+            <div class="tool"><span></span> MLflow</div>
+            <div class="tool"><span></span> Docker + Kubernetes</div>
+            <div class="tool"><span></span> KServe</div>
+            <div class="tool"><span></span> Prometheus + Grafana</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="wrap">
+
+    <!-- ===== PHASE 1 ===== -->
+    <section class="phase" data-step="1" id="phase1">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 1</span>
+            <span class="muted">Data Ingestion & Collection</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Ingestion</h3>
+            <div class="phase-icon"><i class="fa-solid fa-plug"></i></div>
+          </div>
+
+          <p>
+            Bring raw data from databases, APIs, logs, and streams into a reliable store.
+            This is the foundation for training, evaluation and monitoring.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80" alt="Data ingestion" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> Apache Kafka</div>
+            <div class="chip"><span class="tag"></span> Apache NiFi</div>
+            <div class="chip"><span class="tag"></span> Airflow</div>
+            <div class="chip"><span class="tag"></span> Debezium</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Prices are approximate starting points</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Best For</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Apache Kafka</b></td>
+                <td class="muted">Confluent Cloud</td>
+                <td><span class="badge2 b-good">Streaming pipelines</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Apache NiFi</b></td>
+                <td class="muted">Cloudera DataFlow</td>
+                <td><span class="badge2 b-warn">Flow automation</span></td>
+                <td class="price">$0 → enterprise</td>
+              </tr>
+              <tr>
+                <td><b>Airflow</b></td>
+                <td class="muted">MWAA / Cloud Composer</td>
+                <td><span class="badge2 b-good">Orchestration</span></td>
+                <td class="price">$0 → ~$300+/mo</td>
+              </tr>
+              <tr>
+                <td><b>Debezium</b></td>
+                <td class="muted">AWS DMS</td>
+                <td><span class="badge2 b-warn">CDC from DB</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 2 ===== -->
+    <section class="phase" data-step="2" id="phase2">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 2</span>
+            <span class="muted">Data Validation + Quality</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Validation</h3>
+            <div class="phase-icon"><i class="fa-solid fa-shield-check"></i></div>
+          </div>
+
+          <p>
+            Detect schema breaks, missing values, anomalies and bad data before it poisons training.
+            This stage reduces silent failures.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1556155092-490a1ba16284?auto=format&fit=crop&w=1400&q=80" alt="Validation" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> Great Expectations</div>
+            <div class="chip"><span class="tag"></span> TFDV</div>
+            <div class="chip"><span class="tag"></span> Deequ</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Validation is critical in MLOps</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Strength</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Great Expectations</b></td>
+                <td class="muted">Monte Carlo</td>
+                <td><span class="badge2 b-good">Most popular</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>TFDV</b></td>
+                <td class="muted">Vertex AI tools</td>
+                <td><span class="badge2 b-good">ML-ready</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Deequ</b></td>
+                <td class="muted">Bigeye</td>
+                <td><span class="badge2 b-warn">Spark-based</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>Custom tests</b></td>
+                <td class="muted">Soda Cloud</td>
+                <td><span class="badge2 b-warn">Flexible</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 3 ===== -->
+    <section class="phase" data-step="3" id="phase3">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 3</span>
+            <span class="muted">Data Versioning</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Versioning</h3>
+            <div class="phase-icon"><i class="fa-solid fa-code-merge"></i></div>
+          </div>
+
+          <p>
+            Track datasets like Git. This is how you reproduce training and rollback models safely.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=1400&q=80" alt="Versioning" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> DVC</div>
+            <div class="chip"><span class="tag"></span> lakeFS</div>
+            <div class="chip"><span class="tag"></span> Delta Lake</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Reproducibility = survival</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Best For</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>DVC</b></td>
+                <td class="muted">DVC Studio</td>
+                <td><span class="badge2 b-good">Dataset versioning</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+              <tr>
+                <td><b>lakeFS</b></td>
+                <td class="muted">lakeFS Cloud</td>
+                <td><span class="badge2 b-good">Git for data</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+              <tr>
+                <td><b>Delta Lake</b></td>
+                <td class="muted">Databricks Delta</td>
+                <td><span class="badge2 b-warn">Big data lakes</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>Git LFS</b></td>
+                <td class="muted">GitHub LFS</td>
+                <td><span class="badge2 b-warn">Small datasets</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 4 ===== -->
+    <section class="phase" data-step="4" id="phase4">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 4</span>
+            <span class="muted">Feature Engineering + Store</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Features</h3>
+            <div class="phase-icon"><i class="fa-solid fa-cubes"></i></div>
+          </div>
+
+          <p>
+            Convert raw data into reusable features. Feature stores ensure training and serving consistency.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1400&q=80" alt="Features" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> Feast</div>
+            <div class="chip"><span class="tag"></span> dbt Core</div>
+            <div class="chip"><span class="tag"></span> Spark</div>
+            <div class="chip"><span class="tag"></span> Pandas</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Feature stores are MLOps superpower</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Strength</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Feast</b></td>
+                <td class="muted">Tecton</td>
+                <td><span class="badge2 b-good">Best OSS store</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>dbt Core</b></td>
+                <td class="muted">dbt Cloud</td>
+                <td><span class="badge2 b-good">Transformations</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+              <tr>
+                <td><b>Spark</b></td>
+                <td class="muted">Databricks</td>
+                <td><span class="badge2 b-warn">Big data features</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>Pandas</b></td>
+                <td class="muted">Managed notebooks</td>
+                <td><span class="badge2 b-warn">Simple workflows</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 5 ===== -->
+    <section class="phase" data-step="5" id="phase5">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 5</span>
+            <span class="muted">Training + CT</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Training</h3>
+            <div class="phase-icon"><i class="fa-solid fa-brain"></i></div>
+          </div>
+
+          <p>
+            Train models, tune hyperparameters, scale compute. Continuous Training (CT) retrains automatically.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1581091870622-1e7e2f1b4c2a?auto=format&fit=crop&w=1400&q=80" alt="Training" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> PyTorch</div>
+            <div class="chip"><span class="tag"></span> TensorFlow</div>
+            <div class="chip"><span class="tag"></span> XGBoost</div>
+            <div class="chip"><span class="tag"></span> Ray Train</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Compute cost depends on GPU usage</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Best For</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>PyTorch</b></td>
+                <td class="muted">SageMaker Training</td>
+                <td><span class="badge2 b-good">Deep learning</span></td>
+                <td class="price">$0 → GPU cost</td>
+              </tr>
+              <tr>
+                <td><b>TensorFlow</b></td>
+                <td class="muted">Vertex AI Training</td>
+                <td><span class="badge2 b-good">Production DL</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Ray Train</b></td>
+                <td class="muted">Databricks ML</td>
+                <td><span class="badge2 b-warn">Distributed training</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>Katib</b></td>
+                <td class="muted">Optuna Cloud</td>
+                <td><span class="badge2 b-warn">HPO tuning</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 6 ===== -->
+    <section class="phase" data-step="6" id="phase6">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 6</span>
+            <span class="muted">Experiment Tracking</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Tracking</h3>
+            <div class="phase-icon"><i class="fa-solid fa-chart-line"></i></div>
+          </div>
+
+          <p>
+            Track runs, parameters, metrics, and artifacts. Enables comparing models and selecting the best.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1556155092-8707de31f9c4?auto=format&fit=crop&w=1400&q=80" alt="Tracking" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> MLflow</div>
+            <div class="chip"><span class="tag"></span> TensorBoard</div>
+            <div class="chip"><span class="tag"></span> Aim</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Tracking is your model history</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Strength</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>MLflow</b></td>
+                <td class="muted">Databricks MLflow</td>
+                <td><span class="badge2 b-good">Industry standard</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>TensorBoard</b></td>
+                <td class="muted">Vertex AI Experiments</td>
+                <td><span class="badge2 b-warn">Deep learning</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Aim</b></td>
+                <td class="muted">Neptune.ai</td>
+                <td><span class="badge2 b-warn">Lightweight</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+              <tr>
+                <td><b>Custom logs</b></td>
+                <td class="muted">Weights & Biases</td>
+                <td><span class="badge2 b-warn">Best UI</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 7 ===== -->
+    <section class="phase" data-step="7" id="phase7">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 7</span>
+            <span class="muted">Model Registry</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Registry</h3>
+            <div class="phase-icon"><i class="fa-solid fa-box-archive"></i></div>
+          </div>
+
+          <p>
+            Store approved models with versions + metadata. Enables rollback and controlled releases.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1400&q=80" alt="Registry" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> MLflow Registry</div>
+            <div class="chip"><span class="tag"></span> DVC + Git tags</div>
+            <div class="chip"><span class="tag"></span> MinIO</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Registry = controlled deployment</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Best For</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>MLflow Registry</b></td>
+                <td class="muted">Databricks Registry</td>
+                <td><span class="badge2 b-good">Most used</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>DVC + Git</b></td>
+                <td class="muted">SageMaker Registry</td>
+                <td><span class="badge2 b-warn">Simple teams</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>MinIO</b></td>
+                <td class="muted">S3 / GCS</td>
+                <td><span class="badge2 b-warn">Artifacts store</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Custom metadata</b></td>
+                <td class="muted">Vertex AI Registry</td>
+                <td><span class="badge2 b-warn">Enterprise</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 8 ===== -->
+    <section class="phase" data-step="8" id="phase8">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 8</span>
+            <span class="muted">CI for ML (Testing + Validation)</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>CI for ML</h3>
+            <div class="phase-icon"><i class="fa-solid fa-vial-circle-check"></i></div>
+          </div>
+
+          <p>
+            Validate pipeline code, data tests, training tests, drift checks and model quality before promotion.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1556155092-490a1ba16284?auto=format&fit=crop&w=1400&q=80" alt="CI for ML" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> GitHub Actions</div>
+            <div class="chip"><span class="tag"></span> Jenkins</div>
+            <div class="chip"><span class="tag"></span> Pytest</div>
+            <div class="chip"><span class="tag"></span> Evidently</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>CI for ML prevents silent model failures</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Strength</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Jenkins</b></td>
+                <td class="muted">CircleCI</td>
+                <td><span class="badge2 b-good">Max control</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+              <tr>
+                <td><b>GitHub Actions</b></td>
+                <td class="muted">Azure DevOps</td>
+                <td><span class="badge2 b-good">Easy workflows</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Pytest</b></td>
+                <td class="muted">BrowserStack</td>
+                <td><span class="badge2 b-warn">Testing base</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+              <tr>
+                <td><b>Evidently</b></td>
+                <td class="muted">WhyLabs</td>
+                <td><span class="badge2 b-warn">Drift tests</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 9 ===== -->
+    <section class="phase" data-step="9" id="phase9">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 9</span>
+            <span class="muted">Model Packaging</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Packaging</h3>
+            <div class="phase-icon"><i class="fa-solid fa-box"></i></div>
+          </div>
+
+          <p>
+            Convert models into deployable artifacts (Docker images, BentoML bundles, ONNX exports).
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1400&q=80" alt="Packaging" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> Docker</div>
+            <div class="chip"><span class="tag"></span> BentoML</div>
+            <div class="chip"><span class="tag"></span> ONNX</div>
+            <div class="chip"><span class="tag"></span> FastAPI</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Packaging enables portability</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Strength</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Docker</b></td>
+                <td class="muted">ECR / GCR</td>
+                <td><span class="badge2 b-good">Standard</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>BentoML</b></td>
+                <td class="muted">SageMaker deploy</td>
+                <td><span class="badge2 b-warn">Serving ready</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>ONNX</b></td>
+                <td class="muted">TensorRT</td>
+                <td><span class="badge2 b-warn">Cross-framework</span></td>
+                <td class="price">$0 → GPU</td>
+              </tr>
+              <tr>
+                <td><b>FastAPI</b></td>
+                <td class="muted">API Gateway</td>
+                <td><span class="badge2 b-good">Fast inference APIs</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 10 ===== -->
+    <section class="phase" data-step="10" id="phase10">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 10</span>
+            <span class="muted">Deployment (Serving)</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Deploy</h3>
+            <div class="phase-icon"><i class="fa-solid fa-rocket"></i></div>
+          </div>
+
+          <p>
+            Deploy models as APIs, batch jobs, or streaming inference.
+            Supports canary, blue-green and rollback.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80" alt="Deploy" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> Kubernetes</div>
+            <div class="chip"><span class="tag"></span> KServe</div>
+            <div class="chip"><span class="tag"></span> Seldon Core</div>
+            <div class="chip"><span class="tag"></span> Triton</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Serving is where cost + latency matter</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Strength</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>KServe</b></td>
+                <td class="muted">Vertex AI Endpoints</td>
+                <td><span class="badge2 b-good">K8s standard</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Seldon Core</b></td>
+                <td class="muted">Seldon Deploy</td>
+                <td><span class="badge2 b-warn">Advanced routing</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>Triton Server</b></td>
+                <td class="muted">SageMaker Endpoints</td>
+                <td><span class="badge2 b-good">GPU inference</span></td>
+                <td class="price">$0 → GPU</td>
+              </tr>
+              <tr>
+                <td><b>FastAPI</b></td>
+                <td class="muted">Cloud Run</td>
+                <td><span class="badge2 b-warn">Simple deploy</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 11 ===== -->
+    <section class="phase" data-step="11" id="phase11">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 11</span>
+            <span class="muted">Monitoring + Drift Detection</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Monitor</h3>
+            <div class="phase-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+          </div>
+
+          <p>
+            Monitor latency, errors, accuracy and drift.
+            This stage triggers alerts and retraining workflows.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80" alt="Monitoring" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> Prometheus</div>
+            <div class="chip"><span class="tag"></span> Grafana</div>
+            <div class="chip"><span class="tag"></span> Evidently</div>
+            <div class="chip"><span class="tag"></span> WhyLogs</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Monitoring protects production</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Strength</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Prometheus</b></td>
+                <td class="muted">Datadog</td>
+                <td><span class="badge2 b-good">Metrics standard</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>Grafana</b></td>
+                <td class="muted">Grafana Cloud</td>
+                <td><span class="badge2 b-good">Dashboards</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+              <tr>
+                <td><b>Evidently</b></td>
+                <td class="muted">WhyLabs</td>
+                <td><span class="badge2 b-warn">Drift detection</span></td>
+                <td class="price">$0 → $$$</td>
+              </tr>
+              <tr>
+                <td><b>OpenTelemetry</b></td>
+                <td class="muted">New Relic</td>
+                <td><span class="badge2 b-warn">Tracing</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PHASE 12 ===== -->
+    <section class="phase" data-step="12" id="phase12">
+      <div class="node" aria-hidden="true"></div>
+      <div class="connector"></div>
+
+      <div class="phase-grid">
+        <div class="phase-card reveal">
+          <div class="kicker">
+            <span class="pill">Stage 12</span>
+            <span class="muted">Retraining Loop</span>
+          </div>
+
+          <div class="phase-title">
+            <h3>Retrain</h3>
+            <div class="phase-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+          </div>
+
+          <p>
+            Retrain automatically when drift or performance drop is detected.
+            This completes the Continuous Training loop.
+          </p>
+
+          <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1400&q=80" alt="Retraining" />
+
+          <div class="chips">
+            <div class="chip"><span class="tag"></span> Airflow</div>
+            <div class="chip"><span class="tag"></span> Kubeflow Pipelines</div>
+            <div class="chip"><span class="tag"></span> Argo Workflows</div>
+            <div class="chip"><span class="tag"></span> Prefect</div>
+          </div>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-top">
+            <h4>Tools (Open Source vs Paid)</h4>
+            <span>Retraining keeps models alive</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Open Source</th>
+                <th>Paid / Managed</th>
+                <th>Strength</th>
+                <th>Est. Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Airflow</b></td>
+                <td class="muted">Vertex Pipelines</td>
+                <td><span class="badge2 b-good">Orchestration</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Kubeflow Pipelines</b></td>
+                <td class="muted">SageMaker Pipelines</td>
+                <td><span class="badge2 b-warn">ML-native</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Argo Workflows</b></td>
+                <td class="muted">GitHub Actions</td>
+                <td><span class="badge2 b-good">K8s workflows</span></td>
+                <td class="price">$0 → usage</td>
+              </tr>
+              <tr>
+                <td><b>Prefect</b></td>
+                <td class="muted">Prefect Cloud</td>
+                <td><span class="badge2 b-warn">Simple CT</span></td>
+                <td class="price">$0 → paid</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      © 2026 Kantaka Śodhana • MLOps Pipeline • Open Source First + Paid Enterprise Options
+    </div>
+  </footer>
+
+  <script>
+    // ===== Reveal on scroll =====
+    const reveals = [...document.querySelectorAll(".reveal")];
+    const phaseSections = [...document.querySelectorAll("section.phase")];
+    const railFill = document.getElementById("railFill");
+    const topProgress = document.getElementById("topProgress");
+    const nodes = [...document.querySelectorAll(".node")];
+    const navLinks = [...document.querySelectorAll(".mini-nav a")];
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add("show");
+
+          if(entry.target.classList.contains("table-card")){
+            setTimeout(() => entry.target.classList.add("show-rows"), 120);
+          }
+        }
+      });
+    }, { threshold: 0.16 });
+
+    reveals.forEach(el => io.observe(el));
+
+    // ===== Timeline progress fill + active node + active nav =====
+    function updateRail(){
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      const progress = Math.max(0, Math.min(1, scrollTop / scrollHeight));
+
+      railFill.style.height = (progress * 100) + "%";
+      topProgress.style.width = (progress * 100) + "%";
+
+      let activeIndex = 0;
+      phaseSections.forEach((sec, i) => {
+        const r = sec.getBoundingClientRect();
+        const mid = window.innerHeight * 0.45;
+        if(r.top < mid) activeIndex = i;
+      });
+
+      nodes.forEach((n,i) => n.classList.toggle("active", i === activeIndex));
+      navLinks.forEach((a, i) => a.classList.toggle("active", i === activeIndex));
+    }
+
+    window.addEventListener("scroll", updateRail, { passive:true });
+    window.addEventListener("resize", updateRail);
+    updateRail();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kantaka Śodhana — AI Platform</title>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Sanskrit-like font fallback -->
+  <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --panel:#0d1220;
+      --panel2:#0b1020;
+      --text:#eaf0ff;
+      --muted:#a9b6dd;
+      --border:rgba(255,255,255,.08);
+      --accent:#6ee7ff;
+      --accent2:#8b5cf6;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --shadow2: 0 35px 90px rgba(0,0,0,.65);
+      --glow: 0 0 55px rgba(110,231,255,.18);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 900px at 18% 0%, rgba(139,92,246,.22), transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, rgba(110,231,255,.20), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 100%); margin:0 auto; padding:0 20px;}
+
+    /* ===== Top Progress ===== */
+    .top-progress{
+      position:fixed;
+      top:0;left:0;
+      height:4px;
+      width:0%;
+      background:linear-gradient(90deg, var(--accent), var(--accent2));
+      z-index:999;
+      box-shadow:0 0 25px rgba(110,231,255,.25);
+    }
+
+    /* ===== Header ===== */
+    header{
+      position:sticky;
+      top:0;
+      z-index:200;
+      backdrop-filter: blur(16px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 0;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:260px;
+    }
+
+    .logo{
+      width:42px;height:42px;border-radius:16px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.16));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--glow);
+    }
+    .logo i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-size:1.15rem;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:1.05rem;
+      letter-spacing:-.01em;
+      line-height:1.1;
+    }
+
+    .brand span{
+      display:block;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    .navlinks{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .navlinks a{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      color:var(--muted);
+      font-size:.92rem;
+      transition: transform .2s ease, border .2s ease, background .2s ease;
+    }
+
+    .navlinks a:hover{
+      transform: translateY(-2px);
+      border-color: rgba(110,231,255,.35);
+      background: rgba(255,255,255,.04);
+      color: #eaffff;
+    }
+
+    .navlinks a.primary{
+      background: linear-gradient(135deg, rgba(110,231,255,.14), rgba(139,92,246,.14));
+      border-color: rgba(255,255,255,.10);
+      color:#eaffff;
+    }
+
+    /* ================= HERO (UPDATED) ================= */
+    .hero{
+      padding:64px 0 44px;
+      position:relative;
+      overflow:hidden; /* cosmic only inside hero */
+      min-height: 640px;
+    }
+
+    /* Cosmic background mount (FREE, NO BOX) */
+    #cosmicMount{
+      position:absolute;
+      inset:-140px;
+      z-index:0;
+      pointer-events:none;
+
+      opacity: 0.78; /* ✅ reduced brightness slightly */
+
+      mask-image: radial-gradient(circle at 72% 45%, black 55%, transparent 78%);
+      -webkit-mask-image: radial-gradient(circle at 72% 45%, black 55%, transparent 78%);
+    }
+
+    #cosmicMount canvas{
+      width:100% !important;
+      height:100% !important;
+      display:block;
+      background: transparent !important;
+    }
+
+    /* hero content above */
+    .hero .container{
+      position:relative;
+      z-index:2;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      justify-items:center;
+      align-items:center;
+      gap:22px;
+    }
+
+    /* Left glass hero card (centered) */
+    .hero-glass{
+      width: min(760px, 100%);
+      border-radius: 28px;
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: 0 35px 90px rgba(0,0,0,.65);
+      padding: 28px 26px;
+      backdrop-filter: blur(18px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-glass:before{
+      content:"";
+      position:absolute;
+      inset:-120px;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(110,231,255,.20), transparent 55%),
+        radial-gradient(circle at 85% 65%, rgba(139,92,246,.25), transparent 55%);
+      filter: blur(22px);
+      opacity:.8;
+      z-index:0;
+    }
+
+    /* ============================================================
+       ✅ NEW: READABILITY OVERLAY (NO FUNCTION CHANGE / NO POSITION)
+       ============================================================ */
+    .hero-glass::after{
+      content:"";
+      position:absolute;
+      inset:-18px;
+      border-radius: 32px;
+      background: radial-gradient(circle at 35% 20%,
+        rgba(7,10,18,.92) 0%,
+        rgba(7,10,18,.72) 45%,
+        rgba(7,10,18,.35) 75%,
+        rgba(7,10,18,0) 100%
+      );
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .hero-glass *{
+      position:relative;
+      z-index:1;
+    }
+
+    .hero-glass h2{
+      text-shadow: 0 6px 30px rgba(0,0,0,.65);
+    }
+
+    .hero-glass p{
+      color: rgba(232,240,255,.88);
+      text-shadow: 0 4px 20px rgba(0,0,0,.55);
+    }
+    /* ============================================================ */
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      width:max-content;
+      backdrop-filter: blur(10px);
+    }
+
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 20px rgba(110,231,255,.45);
+    }
+
+    .hero h2{
+      margin:14px 0 10px;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      letter-spacing:-.03em;
+      line-height:1.05;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:64ch;
+      font-size:1.05rem;
+    }
+
+    .hero-actions{
+      margin-top:18px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      padding:14px 18px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color:#eaffff;
+      font-weight:800;
+      transition: transform .2s ease, box-shadow .2s ease, border .2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+
+    .btn:hover{transform: translateY(-2px); border-color: rgba(110,231,255,.35);}
+    .btn.primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#070a12;
+      border-color: transparent;
+      box-shadow: 0 18px 45px rgba(110,231,255,.18);
+    }
+
+    /* ===== Section separators ===== */
+    .wave{
+      height:64px;
+      margin: 38px 0 10px;
+      opacity:.55;
+      background:
+        radial-gradient(800px 70px at 20% 50%, rgba(110,231,255,.18), transparent 60%),
+        radial-gradient(700px 70px at 80% 50%, rgba(139,92,246,.18), transparent 60%);
+    }
+
+    /* ===== Sections ===== */
+    .section{
+      padding: 24px 0 10px;
+    }
+
+    .section-title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .section-title h3{
+      margin:0;
+      font-size:1.55rem;
+      letter-spacing:-.02em;
+    }
+    .section-title p{
+      margin:0;
+      color:var(--muted);
+      max-width:60ch;
+      line-height:1.6;
+    }
+
+    /* ===== Capability UI ===== */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      transform-style:preserve-3d;
+      transition: transform .18s ease, box-shadow .2s ease;
+    }
+
+    .card:hover{
+      box-shadow: var(--shadow2);
+    }
+
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-90px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(110,231,255,.16), transparent 60%),
+        radial-gradient(circle at 85% 70%, rgba(139,92,246,.16), transparent 60%);
+      filter: blur(22px);
+      opacity:.65;
+      z-index:0;
+    }
+
+    .card *{position:relative; z-index:1;}
+
+    .card-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .icon{
+      width:46px;height:46px;border-radius:18px;
+      display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+    .icon i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-size:1.15rem;
+    }
+
+    .card h4{
+      margin:0;
+      font-size:1.15rem;
+      letter-spacing:-.01em;
+    }
+
+    .card p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:.98rem;
+    }
+
+    .tags{
+      margin-top:14px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .tag{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      font-size:.86rem;
+      color:#dbe7ff;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .tag .mini-dot{
+      width:8px;height:8px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 18px rgba(110,231,255,.35);
+    }
+
+    /* ===== SOTA block ===== */
+    .sota{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(135deg, rgba(110,231,255,.06), rgba(139,92,246,.06));
+      box-shadow: var(--shadow2);
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .sota:before{
+      content:"";
+      position:absolute;
+      inset:-100px;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(110,231,255,.22), transparent 55%),
+        radial-gradient(circle at 75% 60%, rgba(139,92,246,.24), transparent 55%);
+      filter: blur(22px);
+      z-index:0;
+    }
+
+    .sota *{position:relative; z-index:1;}
+
+    .sota-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .sanskrit{
+      font-family: "Tiro Devanagari Sanskrit", ui-serif, serif;
+      font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+      margin:0;
+      letter-spacing:.01em;
+    }
+
+    .sota p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width: 75ch;
+    }
+
+    /* ===== Stats ===== */
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:16px;
+    }
+
+    .stat{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .stat b{
+      display:block;
+      font-size:2.2rem;
+      letter-spacing:-.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-weight:900;
+    }
+
+    .stat span{
+      color:var(--muted);
+      display:block;
+      margin-top:6px;
+      line-height:1.4;
+    }
+
+    /* ===== Testimonials ===== */
+    .test-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
+    }
+
+    .test{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+    }
+
+    .test p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-style: italic;
+    }
+
+    .test .who{
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .avatar{
+      width:42px;height:42px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      display:grid;
+      place-items:center;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+    .avatar i{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .who b{display:block}
+    .who span{display:block; color:var(--muted); font-size:.9rem}
+
+    /* ===== CTA ===== */
+    .cta{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(135deg, rgba(110,231,255,.10), rgba(139,92,246,.10));
+      box-shadow: var(--shadow2);
+      padding:26px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .cta:before{
+      content:"";
+      position:absolute;
+      inset:-120px;
+      background:
+        radial-gradient(circle at 25% 30%, rgba(110,231,255,.20), transparent 55%),
+        radial-gradient(circle at 75% 60%, rgba(139,92,246,.22), transparent 55%);
+      filter: blur(24px);
+      z-index:0;
+    }
+
+    .cta *{position:relative; z-index:1;}
+
+    .cta h4{
+      margin:0;
+      font-size:1.4rem;
+      letter-spacing:-.02em;
+    }
+    .cta p{
+      margin:6px 0 0;
+      color:var(--muted);
+      line-height:1.6;
+      max-width: 70ch;
+    }
+
+    /* ===== Team ===== */
+    .team{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
+    }
+
+    .member{
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .member:hover{
+      transform: translateY(-6px);
+      box-shadow: var(--shadow2);
+    }
+
+    .member-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .pfp{
+      width:56px;height:56px;border-radius:20px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      display:grid;
+      place-items:center;
+      box-shadow: 0 18px 45px rgba(0,0,0,.35);
+    }
+
+    .pfp i{
+      font-size:1.4rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .member h4{
+      margin:12px 0 4px;
+      font-size:1.1rem;
+    }
+
+    .member .role{
+      color:var(--muted);
+      margin:0;
+      font-size:.95rem;
+      line-height:1.4;
+    }
+
+    .socials{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .socials a{
+      width:42px;height:42px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      display:grid;
+      place-items:center;
+      color:#dbe7ff;
+      transition: transform .2s ease, border .2s ease, background .2s ease;
+    }
+
+    .socials a:hover{
+      transform: translateY(-3px);
+      border-color: rgba(110,231,255,.35);
+      background: rgba(255,255,255,.06);
+    }
+
+    /* ===== Reveal ===== */
+    .reveal{
+      opacity:0;
+      transform: translateY(28px);
+      filter: blur(7px);
+      transition: opacity .75s ease, transform .75s ease, filter .75s ease;
+    }
+    .reveal.show{
+      opacity:1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    /* ===== Footer ===== */
+    footer{
+      margin-top:55px;
+      padding:42px 0 28px;
+      border-top:1px solid rgba(255,255,255,.06);
+      color:var(--muted);
+    }
+
+    .footer-grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .footlinks{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+    }
+
+    .footlinks a{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    .copyright{
+      margin-top:16px;
+      font-size:.92rem;
+      opacity:.9;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
+      .test-grid{grid-template-columns:1fr}
+      .team{grid-template-columns:1fr}
+      .footer-grid{grid-template-columns:1fr}
+      .brand{min-width:auto}
+      .nav{flex-wrap:wrap}
+      .navlinks{justify-content:flex-start}
+      .footlinks{justify-content:flex-start}
+
+      .hero{
+        min-height: 720px;
+      }
+
+      #cosmicMount{
+        inset:-180px;
+        mask-image: radial-gradient(circle at 55% 30%, black 55%, transparent 82%);
+        -webkit-mask-image: radial-gradient(circle at 55% 30%, black 55%, transparent 82%);
+      }
+    }
+
+    /* ===================== PRELOADER ===================== */
+    .preloader{
+      position:fixed;
+      inset:0;
+      z-index:999999;
+      background: radial-gradient(1200px 900px at 20% 0%, rgba(139,92,246,.25), transparent 60%),
+                  radial-gradient(900px 700px at 80% 20%, rgba(110,231,255,.22), transparent 60%),
+                  #070a12;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+    }
+
+    .pre-wrap{
+      display:grid;
+      place-items:center;
+      gap:22px;
+      transform: translateY(-10px);
+    }
+
+    .tri{
+      width:220px;
+      height:auto;
+      filter: drop-shadow(0 0 25px rgba(110,231,255,.25));
+      opacity:.95;
+    }
+
+    #triPath{
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: triDraw 1.35s ease forwards, triGlow 1.7s ease-in-out infinite;
+    }
+
+    @keyframes triDraw{ to{ stroke-dashoffset: 0; } }
+    @keyframes triGlow{
+      0%,100%{ filter: drop-shadow(0 0 12px rgba(110,231,255,.22)); opacity:.9; }
+      50%{ filter: drop-shadow(0 0 30px rgba(139,92,246,.35)); opacity:1; }
+    }
+
+    .eye{
+      width:240px;
+      height:auto;
+      opacity:0;
+      transform: scale(.92);
+      animation: eyeAppear .55s ease forwards;
+      animation-delay: 1.15s;
+    }
+
+    @keyframes eyeAppear{ to{ opacity:1; transform: scale(1); } }
+
+    .eye-outline{
+      stroke: rgba(232,240,255,.92);
+      stroke-width: 3.5;
+      fill: transparent;
+      filter: drop-shadow(0 0 22px rgba(110,231,255,.22));
+      animation: outlinePulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes outlinePulse{ 0%,100%{ opacity:.75; } 50%{ opacity:1; } }
+
+    .iris-ring{
+      stroke: rgba(110,231,255,.9);
+      stroke-width: 2.5;
+      fill: transparent;
+      opacity:.9;
+      filter: drop-shadow(0 0 18px rgba(110,231,255,.35));
+    }
+
+    .pupil{
+      fill: rgba(255,255,255,.9);
+      opacity:.85;
+      filter: drop-shadow(0 0 14px rgba(139,92,246,.35));
+      transform-origin: 130px 60px;
+    }
+
+    .lid{
+      fill: #070a12;
+      opacity:0;
+      transform-origin: center;
+      transform: scaleY(0);
+      animation: blink 3.2s infinite;
+      animation-delay: 1.9s;
+    }
+
+    @keyframes blink{
+      0%, 8%, 100%{ transform: scaleY(0); opacity:0; }
+      10%{ transform: scaleY(1); opacity:1; }
+      14%{ transform: scaleY(0); opacity:0; }
+      55%{ transform: scaleY(0); opacity:0; }
+      58%{ transform: scaleY(1); opacity:1; }
+      62%{ transform: scaleY(0); opacity:0; }
+    }
+
+    .loading-text{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: rgba(232,240,255,.75);
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      font-size:.9rem;
+    }
+
+    .loading-text .glow{
+      background: linear-gradient(135deg, #6ee7ff, #8b5cf6, #ff4fd8);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      filter: drop-shadow(0 0 18px rgba(110,231,255,.18));
+    }
+
+    .loading-text .dots{
+      display:inline-block;
+      width:24px;
+      text-align:left;
+      animation: dots 1.2s infinite;
+    }
+
+    @keyframes dots{ 0%{ opacity:.2 } 50%{ opacity:1 } 100%{ opacity:.2 } }
+
+    .preloader.hide{
+      animation: preOut .7s ease forwards;
+    }
+
+    @keyframes preOut{
+      to{ opacity:0; transform: scale(1.02); pointer-events:none; }
+    }
+  </style>
+
+  <!-- Three.js importmap -->
+  <script type="importmap">
+  {
+      "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+      }
+  }
+  </script>
+</head>
+
+<body>
+
+  <!-- ===================== PRELOADER ===================== -->
+  <div class="preloader" id="preloader">
+    <div class="pre-wrap">
+      <svg class="tri" viewBox="0 0 200 180" fill="none">
+        <path id="triPath"
+          d="M100 10 L190 170 L10 170 Z"
+          stroke="url(#triGrad)"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          pathLength="1"
+        />
+        <defs>
+          <linearGradient id="triGrad" x1="0" y1="0" x2="200" y2="180" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6ee7ff"/>
+            <stop offset="0.5" stop-color="#8b5cf6"/>
+            <stop offset="1" stop-color="#ff4fd8"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <svg class="eye" viewBox="0 0 260 120" fill="none">
+        <path class="eye-outline"
+          d="M10 60 C 45 20, 95 10, 130 10
+             C 165 10, 215 20, 250 60
+             C 215 100, 165 110, 130 110
+             C 95 110, 45 100, 10 60 Z" />
+
+        <circle class="iris-ring" cx="130" cy="60" r="28" />
+        <circle class="pupil" cx="130" cy="60" r="9" />
+
+        <path class="lid"
+          d="M10 60 C 45 20, 95 10, 130 10
+             C 165 10, 215 20, 250 60
+             C 215 100, 165 110, 130 110
+             C 95 110, 45 100, 10 60 Z" />
+      </svg>
+
+      <div class="loading-text">
+        <span class="glow">Loading</span>
+        <span class="dots">...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-progress" id="topProgress"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="{{ url_for('index') }}">
+          <div class="logo"><i class="fa-solid fa-robot"></i></div>
+          <div>
+            <h1>Kantaka Śodhana</h1>
+            <span>AI & MLOps Platform</span>
+          </div>
+        </a>
+
+        <nav class="navlinks">
+    <a href="{{ url_for('index') }}">Overview</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('usecases') }}">Use Cases</a>
+        <a href="{{ url_for('mlops') }}">MLOps</a>
+        <a href="{{ url_for('architecture') }}">Architecture</a>
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('admin_panel') }}" style="border-color: #8b5cf6;">Admin</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}">Logout ({{ current_user.username }})</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="explore" style="box-shadow: 0 0 20px rgba(110,231,255,0.4);">
+            <i class="fa-solid fa-lock"></i> Dashboard Login
+        </a>
+    {% endif %}
+</nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+
+    <!-- FREE cosmic background (NO BOX) -->
+    <div id="cosmicMount" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="hero-grid">
+
+        <div class="hero-glass reveal">
+
+          <div class="badge">
+            <div class="dot"></div>
+            <span>Fraud is the thorn in the side of progress. We provide the tools to extract it at scale.</span>
+          </div>
+
+          <h2>
+            Kantaka Śodhana - <br/>
+            Removing the Thorns of Deception
+          </h2>
+
+          <p>
+            In classical governance, Kantaka Śodhana refers to the "removal of thorns"—the proactive purging of antisocial elements, thieves, and fraudsters to protect the marketplace.
+            <br/><br/>
+            We’ve brought this concept into the 21st century. In the digital economy, "thorns" are no longer just individuals; they are sophisticated, automated, and hidden within massive datasets.
+            Kantaka Śodhana is the platform that automates the extraction.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn primary" href="{{ url_for('mlops') }}">
+              <i class="fa-solid fa-diagram-project"></i>
+              Explore MLOps Pipeline
+            </a>
+            <a class="btn" href="{{ url_for('usecases') }}">
+              <i class="fa-solid fa-layer-group"></i>
+              View Use Cases
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="wave"></div>
+
+  <!-- CAPABILITIES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title reveal">
+        <div>
+          <h3>What We Can Build</h3>
+          <p>
+            A complete AI platform is more than model training.
+            It includes validation, tracking, governance, deployment, and monitoring.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card reveal" data-tilt>
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-database"></i></div>
+            <h4>Data Pipelines</h4>
+          </div>
+          <p>
+            Automated ingestion, validation, transformation and versioning.
+            Supports batch + streaming.
+          </p>
+          <div class="tags">
+            <div class="tag"><span class="mini-dot"></span> Airflow</div>
+            <div class="tag"><span class="mini-dot"></span> Kafka</div>
+            <div class="tag"><span class="mini-dot"></span> DVC</div>
+          </div>
+        </div>
+
+        <div class="card reveal" data-tilt>
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-brain"></i></div>
+            <h4>Training + Experiments</h4>
+          </div>
+          <p>
+            Track every run, compare models, and scale training to GPU clusters.
+          </p>
+          <div class="tags">
+            <div class="tag"><span class="mini-dot"></span> MLflow</div>
+            <div class="tag"><span class="mini-dot"></span> PyTorch</div>
+            <div class="tag"><span class="mini-dot"></span> Ray Tune</div>
+          </div>
+        </div>
+
+        <div class="card reveal" data-tilt>
+          <div class="card-top">
+            <div class="icon"><i class="fa-solid fa-rocket"></i></div>
+            <h4>Deployment + Serving</h4>
+          </div>
+          <p>
+            Deploy models as APIs, batch jobs, or streaming inference with rollback support.
+          </p>
+          <div class="tags">
+            <div class="tag"><span class="mini-dot"></span> KServe</div>
+            <div class="tag"><span class="mini-dot"></span> BentoML</div>
+            <div class="tag"><span class="mini-dot"></span> Kubernetes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wave"></div>
+
+  <!-- STATS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title reveal">
+        <div>
+          <h3>Why Businesses Need MLOps</h3>
+          <p>
+            MLOps is the missing layer between research and production.
+            It helps teams ship faster, safer, and with full governance.
+          </p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat reveal">
+          <b>3×</b>
+          <span>Faster model delivery with automation</span>
+        </div>
+        <div class="stat reveal">
+          <b>60%</b>
+          <span>Reduction in production failures</span>
+        </div>
+        <div class="stat reveal">
+          <b>24/7</b>
+          <span>Monitoring + drift detection</span>
+        </div>
+        <div class="stat reveal">
+          <b>100%</b>
+          <span>Traceability: data → model → deployment</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wave"></div>
+
+  <!-- SOTA -->
+  <section class="section">
+    <div class="container">
+      <div class="sota reveal">
+        <div class="sota-top">
+          <div>
+            <p class="pill" style="display:inline-flex;">SOTA (State of the Art)</p>
+            <h3 class="sanskrit">कण्टकशोधन (Kantaka Śodhana)</h3>
+            <p>
+              A modern MLOps-first architecture that blends open-source tooling with enterprise governance.
+              The goal is to build a platform that is scalable, auditable, and production-ready.
+            </p>
+          </div>
+          <div class="pill">AI Platform • MLOps • Monitoring • Retraining</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wave"></div>
+
+  <!-- TESTIMONIALS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title reveal">
+        <div>
+          <h3>What Experts Say</h3>
+          <p>
+            The industry is shifting from "model building" to "model operations".
+            These are the core reasons why MLOps is critical.
+          </p>
+        </div>
+      </div>
+
+      <div class="test-grid">
+        <div class="test reveal">
+          <p>
+            “High performers understand they don’t have to trade speed for stability…
+            by building quality in they get both.”
+          </p>
+          <div class="who">
+            <div class="avatar"><i class="fa-solid fa-award"></i></div>
+            <div>
+              <b>Dr. Nicole Forsgren</b>
+              <span>DORA co-founder • DevOps Research</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="test reveal">
+          <p>
+            “If you release every year, you’re a dinosaur now.
+            If everyone else releases multiple times, you’re left behind.”
+          </p>
+          <div class="who">
+            <div class="avatar"><i class="fa-solid fa-bolt"></i></div>
+            <div>
+              <b>Edith Harbaugh</b>
+              <span>CEO • LaunchDarkly</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="test reveal">
+          <p>
+            “The speed with which you can innovate is determined by how fast you can ship.
+            MLOps is the way to ship ML reliably.”
+          </p>
+          <div class="who">
+            <div class="avatar"><i class="fa-solid fa-rocket"></i></div>
+            <div>
+              <b>Industry Consensus</b>
+              <span>AI Platforms & Production Teams</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wave"></div>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="cta reveal">
+        <div>
+          <h4>Want to see the full MLOps pipeline flow?</h4>
+          <p>
+            Explore our pipeline breakdown with open-source vs paid tool comparisons,
+            realistic cost estimates, and stage-by-stage production flow.
+          </p>
+        </div>
+        <a class="btn primary" href="{{ url_for('mlops') }}">
+          <i class="fa-solid fa-diagram-project"></i>
+          Open MLOps Pipeline
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wave"></div>
+
+  <!-- TEAM 
+  <section class="section" id="team">
+    <div class="container">
+      <div class="section-title reveal">
+        <div>
+          <h3>Team</h3>
+          <p>
+            A small focused team building production-grade AI solutions with clean design,
+            automation-first MLOps, and enterprise readiness.
+          </p>
+        </div>
+      </div>
+
+      <div class="team">
+        <div class="member reveal" data-tilt>
+          <div class="member-top">
+            <div class="pfp"><i class="fa-solid fa-user-astronaut"></i></div>
+            <span class="pill">AI / MLOps</span>
+          </div>
+          <h4>Your Name</h4>
+          <p class="role">MLOps Engineer • Platform Design</p>
+
+          <div class="socials">
+            <a href="https://linkedin.com" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="https://instagram.com" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="mailto:yourmail@gmail.com" title="Email"><i class="fa-solid fa-envelope"></i></a>
+          </div>
+        </div>
+
+        <div class="member reveal" data-tilt>
+          <div class="member-top">
+            <div class="pfp"><i class="fa-solid fa-user-ninja"></i></div>
+            <span class="pill">Data</span>
+          </div>
+          <h4>Your Name</h4>
+          <p class="role">Data Engineer • Pipelines</p>
+
+          <div class="socials">
+            <a href="https://linkedin.com" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="https://instagram.com" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="mailto:yourmail@gmail.com" title="Email"><i class="fa-solid fa-envelope"></i></a>
+          </div>
+        </div>
+
+        <div class="member reveal" data-tilt>
+          <div class="member-top">
+            <div class="pfp"><i class="fa-solid fa-user-secret"></i></div>
+            <span class="pill">Frontend</span>
+          </div>
+          <h4>Your Name</h4>
+          <p class="role">UI Engineer • Web Experience</p>
+
+          <div class="socials">
+            <a href="https://linkedin.com" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="https://instagram.com" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="mailto:yourmail@gmail.com" title="Email"><i class="fa-solid fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="badge" style="margin-bottom:12px;">
+            <div class="dot"></div>
+            <span>Kantaka Śodhana • AI Platform</span>
+          </div>
+          <div style="color:var(--muted); line-height:1.65;">
+            A clean business UI for showcasing AI capabilities, MLOps pipelines,
+            and enterprise-ready delivery.
+          </div>
+          <div class="copyright">
+            © <span id="year"></span> Kantaka Śodhana. All rights reserved.
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================= BASE JS ========================= -->
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const topProgress = document.getElementById("topProgress");
+    function updateProgress(){
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      const p = Math.max(0, Math.min(1, scrollTop / scrollHeight));
+      topProgress.style.width = (p * 100) + "%";
+    }
+    window.addEventListener("scroll", updateProgress, { passive:true });
+    updateProgress();
+
+    const reveals = [...document.querySelectorAll(".reveal")];
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) entry.target.classList.add("show");
+      });
+    }, { threshold: 0.14 });
+    reveals.forEach(el => io.observe(el));
+
+    const tilts = document.querySelectorAll("[data-tilt]");
+    tilts.forEach(card => {
+      card.addEventListener("mousemove", (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        const rx = (y - 0.5) * -10;
+        const ry = (x - 0.5) * 12;
+        card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+      });
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+
+    const pupil = document.querySelector(".pupil");
+    let t = 0;
+    function watchLoop(){
+      t += 0.018;
+      const x = Math.sin(t) * 8;
+      const y = Math.cos(t * 1.3) * 4;
+      pupil.setAttribute("cx", 130 + x);
+      pupil.setAttribute("cy", 60 + y);
+      requestAnimationFrame(watchLoop);
+    }
+    watchLoop();
+
+    window.addEventListener("load", () => {
+      const pre = document.getElementById("preloader");
+      setTimeout(() => {
+        pre.classList.add("hide");
+        setTimeout(() => pre.remove(), 850);
+      }, 900);
+    });
+  </script>
+
+  <!-- ========================= COSMIC HERO BACKGROUND ========================= -->
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+    import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+    import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+
+    let scene, camera, renderer, composer, controls, clock;
+    let coreSphere, orbitRings, mainGroup, starfield;
+    let mouse = new THREE.Vector2(-10, -10);
+
+    const mount = document.getElementById("cosmicMount");
+    const hero = document.getElementById("hero");
+
+    const pointMaterialShader = {
+      vertexShader: `
+        attribute float size;
+        attribute vec3 randomDir;
+        varying vec3 vColor;
+        varying float vMouseEffect;
+        uniform float time;
+        uniform vec2 uMouse;
+
+        void main() {
+          vColor = color;
+
+          vec4 projectedVertex = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          vec2 screenPos = projectedVertex.xy / projectedVertex.w;
+          float mouseDist = distance(screenPos, uMouse);
+          float mouseEffect = 1.0 - smoothstep(0.0, 0.30, mouseDist);
+          vMouseEffect = mouseEffect;
+
+          vec3 wobble = vec3(
+            sin(time * 0.8 + position.x * 0.5),
+            cos(time * 0.9 + position.y * 0.5),
+            sin(time * 0.7 + position.z * 0.5)
+          ) * (0.25 + mouseEffect * 0.8);
+
+          vec3 finalPos = position + wobble;
+          vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
+
+          float pulse = sin(time + length(position)) * 0.12 + 1.0;
+          gl_PointSize = size * (420.0 / -mvPosition.z) * pulse * (1.0 + vMouseEffect * 0.6);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vMouseEffect;
+        uniform float time;
+
+        float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); }
+
+        void main() {
+          vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+          float r = dot(cxy, cxy);
+          if (r > 1.0) discard;
+
+          float glow = exp(-r * 3.2) + vMouseEffect * 0.55;
+          float twinkle = rand(gl_PointCoord + time) * 0.4 + 0.65;
+
+          vec3 finalColor = vColor * (1.0 + sin(time * 0.9) * 0.2) * glow * twinkle;
+          gl_FragColor = vec4(finalColor, glow);
+        }
+      `
+    };
+
+    const starShader = {
+      vertexShader: `
+        attribute float size;
+        varying vec3 vColor;
+        uniform float time;
+
+        void main() {
+          vColor = color;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          float twinkle = sin(time * 2.0 + position.x * 0.1 + position.y * 0.2) * 0.3 + 0.7;
+          gl_PointSize = size * twinkle * (900.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        void main() {
+          vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+          float r = dot(cxy, cxy);
+          if (r > 1.0) discard;
+          float glow = exp(-r * 4.0);
+          gl_FragColor = vec4(vColor, glow * 0.65);
+        }
+      `
+    };
+
+    function createPointShaderMaterial() {
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 },
+          uMouse: { value: mouse }
+        },
+        vertexShader: pointMaterialShader.vertexShader,
+        fragmentShader: pointMaterialShader.fragmentShader,
+        vertexColors: true,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+    }
+
+    function createSpiralSphere(radius, particleCount) {
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+      const sizes = new Float32Array(particleCount);
+      const randomDirs = new Float32Array(particleCount * 3);
+
+      const palette = [
+        new THREE.Color(0x6ee7ff),
+        new THREE.Color(0x8b5cf6),
+        new THREE.Color(0xff4fd8)
+      ];
+
+      const temp = new THREE.Vector3();
+
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const phi = Math.acos(-1 + (2 * i) / particleCount);
+        const theta = Math.sqrt(particleCount * Math.PI) * phi;
+
+        positions[i3] = radius * Math.cos(theta) * Math.sin(phi);
+        positions[i3 + 1] = radius * Math.sin(theta) * Math.sin(phi);
+        positions[i3 + 2] = radius * Math.cos(phi);
+
+        const c = palette[i % palette.length];
+        colors[i3] = c.r;
+        colors[i3 + 1] = c.g;
+        colors[i3 + 2] = c.b;
+
+        sizes[i] = Math.random() * 0.24 + 0.10;
+
+        temp.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
+        randomDirs[i3] = temp.x;
+        randomDirs[i3 + 1] = temp.y;
+        randomDirs[i3 + 2] = temp.z;
+      }
+
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+      geometry.setAttribute("randomDir", new THREE.BufferAttribute(randomDirs, 3));
+
+      return new THREE.Points(geometry, createPointShaderMaterial());
+    }
+
+    function createOrbitRings(radius, count, thickness) {
+      const group = new THREE.Group();
+      const palette = [
+        new THREE.Color(0x6ee7ff),
+        new THREE.Color(0x8b5cf6),
+        new THREE.Color(0xff4fd8)
+      ];
+
+      for (let i = 0; i < count; i++) {
+        const particleCount = 3000;
+        const ringGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        const sizes = new Float32Array(particleCount);
+
+        for (let j = 0; j < particleCount; j++) {
+          const j3 = j * 3;
+          const angle = (j / particleCount) * Math.PI * 2;
+          const radiusVariation = radius + (Math.random() - 0.5) * thickness;
+
+          positions[j3] = Math.cos(angle) * radiusVariation;
+          positions[j3 + 1] = (Math.random() - 0.5) * (thickness * 0.5);
+          positions[j3 + 2] = Math.sin(angle) * radiusVariation;
+
+          const c = palette[(i + j) % palette.length];
+          colors[j3] = c.r;
+          colors[j3 + 1] = c.g;
+          colors[j3 + 2] = c.b;
+
+          sizes[j] = Math.random() * 0.17 + 0.08;
+        }
+
+        ringGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        ringGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+        ringGeometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+
+        const ring = new THREE.Points(ringGeometry, createPointShaderMaterial());
+        ring.rotation.x = Math.random() * Math.PI;
+        ring.rotation.y = Math.random() * Math.PI;
+        group.add(ring);
+      }
+
+      return group;
+    }
+
+    function createStarfield(count, spread) {
+      const geometry = new THREE.BufferGeometry();
+      const positions = [];
+      const colors = [];
+      const sizes = [];
+
+      for (let i = 0; i < count; i++) {
+        positions.push(
+          (Math.random() - 0.5) * spread,
+          (Math.random() - 0.5) * spread,
+          (Math.random() - 0.5) * spread
+        );
+
+        const color = new THREE.Color();
+        color.setHSL(Math.random() * 0.1 - 0.05, 0.2, 0.5 + Math.random() * 0.5);
+        colors.push(color.r, color.g, color.b);
+
+        sizes.push(0.5 + Math.random() * 1.0);
+      }
+
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geometry.setAttribute("size", new THREE.Float32BufferAttribute(sizes, 1));
+
+      const material = new THREE.ShaderMaterial({
+        uniforms: { time: { value: 0 } },
+        vertexShader: starShader.vertexShader,
+        fragmentShader: starShader.fragmentShader,
+        vertexColors: true,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+
+      return new THREE.Points(geometry, material);
+    }
+
+    function initCosmic() {
+      clock = new THREE.Clock();
+      scene = new THREE.Scene();
+
+      const w = hero.clientWidth;
+      const h = hero.clientHeight;
+
+      camera = new THREE.PerspectiveCamera(65, w / h, 0.1, 50000);
+      camera.position.set(0, 4.2, 12.2);
+
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance"
+      });
+
+      renderer.setClearColor(0x000000, 0);
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      mount.appendChild(renderer.domElement);
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.rotateSpeed = 0.6;
+      controls.enableZoom = false;
+      controls.enablePan = false;
+
+      const renderScene = new RenderPass(scene, camera);
+      const bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), 0.85, 0.35, 0.1);
+
+      composer = new EffectComposer(renderer);
+      composer.addPass(renderScene);
+      composer.addPass(bloomPass);
+
+      coreSphere = createSpiralSphere(4.8, 26000);
+      orbitRings = createOrbitRings(7.2, 7, 0.55);
+      starfield = createStarfield(5000, 42000);
+
+      mainGroup = new THREE.Group();
+      mainGroup.add(coreSphere);
+      mainGroup.add(orbitRings);
+      scene.add(mainGroup);
+
+      scene.add(starfield);
+
+      const centralLight = new THREE.PointLight(0xffffff, 2.2, 0);
+      centralLight.position.set(0, 0, 0);
+      scene.add(centralLight);
+
+      window.addEventListener("mousemove", onMouseMove, { passive: true });
+
+      const ro = new ResizeObserver(() => onResize());
+      ro.observe(hero);
+
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const time = clock.getElapsedTime();
+
+      coreSphere.material.uniforms.time.value = time;
+      coreSphere.material.uniforms.uMouse.value.copy(mouse);
+
+      orbitRings.children.forEach((ring, index) => {
+        ring.material.uniforms.time.value = time;
+        ring.material.uniforms.uMouse.value.copy(mouse);
+
+        const speed = 0.00055 * (index + 1);
+        ring.rotation.z += speed;
+        ring.rotation.x += speed * 0.3;
+        ring.rotation.y += speed * 0.2;
+      });
+
+      if (starfield?.material?.uniforms?.time) {
+        starfield.material.uniforms.time.value = time;
+      }
+
+      const breathe = 1 + Math.sin(time * 1.5) * 0.05;
+      coreSphere.scale.set(breathe, breathe, breathe);
+
+      mainGroup.rotation.y += 0.00055;
+
+      controls.update();
+      composer.render();
+    }
+
+    function onResize() {
+      const w = hero.clientWidth;
+      const h = hero.clientHeight;
+
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(w, h);
+      composer.setSize(w, h);
+    }
+
+    function onMouseMove(e) {
+      const rect = hero.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+      mouse.x = x;
+      mouse.y = y;
+    }
+
+    window.addEventListener("load", () => {
+      initCosmic();
+    });
+  </script>
+
+</body>
+</html>
