@@ -31,7 +31,6 @@ export default function Footer() {
               { label: "Process", href: "/#process" },
               { label: "Stack", href: "/#stack" },
               { label: "Wins", href: "/#wins" },
-              { label: "Team", href: "/#team" },
               { label: "Contact", href: "/#contact" },
             ].map((l) => (
               <Link
