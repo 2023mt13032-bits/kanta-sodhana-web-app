@@ -8,6 +8,9 @@ envs:
 - key: FLASK_AUTH_URL
   scope: RUN_AND_BUILD_TIME
   value: http://kantaka-auth:8080
+- key: RISK_SCORING_URL
+  scope: RUN_AND_BUILD_TIME
+  value: http://risk-scoring:8080
 - key: FORGERY_API_URL
   scope: RUN_AND_BUILD_TIME
   value: http://doc-forgery:8080
