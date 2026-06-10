@@ -44,8 +44,8 @@ function Tab({
       <Link
         href={href}
         onClick={(e) => onClick(href, e)}
-        className={`block whitespace-nowrap px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] mix-blend-difference ${
-          isActive ? "text-white" : "text-white/70"
+        className={`block whitespace-nowrap px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.15em] transition-colors duration-200 ${
+          isActive ? "text-[var(--text)]" : "text-[var(--text-muted)] hover:text-[var(--text)]"
         } md:px-4 md:py-2`}
       >
         {children}
